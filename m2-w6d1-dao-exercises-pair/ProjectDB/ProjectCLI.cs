@@ -21,7 +21,7 @@ namespace ProjectDB
         const string Command_AssignEmployeeToProject = "9";
         const string Command_RemoveEmployeeFromProject = "10";
         const string Command_Quit = "q";
-        const string DatabaseConnection = "";
+        const string DatabaseConnection = @"Data Source=.\SQLEXPRESS;Initial Catalog=ProjectOrganizer2;Integrated Security = True";
 
         public void RunCLI()
         {
@@ -157,11 +157,13 @@ namespace ProjectDB
         {
             int departmentId = CLIHelper.GetInteger("Which department are you updating?");
             string updatedName = CLIHelper.GetString("Provide the new name:");
+
             Department updatedDepartment = new Department
             {
                 Id = departmentId,
                 Name = updatedName
             };
+
             DepartmentSqlDAL dal = new DepartmentSqlDAL(DatabaseConnection);
             bool result = dal.UpdateDepartment(updatedDepartment);
 
