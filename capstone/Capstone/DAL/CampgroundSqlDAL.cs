@@ -11,7 +11,7 @@ namespace Capstone.DAL
 
     public class CampgroundSqlDAL
     {
-        public string connectionString;
+        string connectionString = ConfigurationManager.ConnectionStrings["CapstoneDatabase"].ConnectionString;
         private const string SQL_GetParks = "select * from park order by name asc";
         private const string SQL_GetParkInfo = "select name, location, establish_date, area, visitors, description from park";
         private const string SQL_GetAllCampgroundsInPark = "select campground.name from campground join park on park.park_id = campground.park_id where park.name = @parkname";
