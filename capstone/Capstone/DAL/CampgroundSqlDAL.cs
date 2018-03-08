@@ -8,16 +8,44 @@ using Capstone.Models;
 
 namespace Capstone.DAL
 {
-    class CampgroundSqlDAL
-
-
+    public class CampgroundSqlDAL
     {
-        public List<Campground> GetParkWithAvailableCampgrounds(string parkName)
+        public string connectionString;
+        private const string SQL_GetTeams = "SELECT * FROM Park";
+
+        public List<Park> GetAllParksAlphabetically()
         {
+            List<Park> parks = new List<Park>();
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand(SQL_GetTeams, conn);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        Team item = GetTeamsFromReader(reader);
+                        teams.Add(item);
+                    }
+
+                }
+            }
+            catch (SqlException)
+            {
+
+                throw;
+            }
+
+            return teams;
 
         }
 
-        public List<Park> GetAllParksAlphabetically()
+        public List<Campground> GetParkWithAvailableCampgrounds(string parkName)
         {
 
         }
