@@ -19,7 +19,7 @@ namespace Capstone
         private const string command_ViewCampgrounds = "1";
         private const string command_SearchReservations = "2";
         private const string command_ReturnToPreviousScreen = "3";
-        private const string command_SearchAvailableReservatgions = "1";
+        private const string command_SearchAvailableReservations = "1";
         private const string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Campground;Integrated Security = True";
         private Dictionary<int, string> Parks = new Dictionary<int, string>()
         {
@@ -38,7 +38,7 @@ namespace Capstone
             while (true)
             {
                 ConsoleKeyInfo userInput = Console.ReadKey();
-                string command = userInput.ToString();
+                string command = userInput.KeyChar.ToString();
 
                 switch (command)
                 {
@@ -71,7 +71,7 @@ namespace Capstone
             Console.WriteLine("Select a Park for further Details");
             Console.WriteLine(" 1) Acadia");
             Console.WriteLine(" 2) Arches");
-            Console.WriteLine(" 3) Cuyahoga NAtional Valley Park");
+            Console.WriteLine(" 3) Cuyahoga National Valley Park");
             Console.WriteLine();
 
             Console.WriteLine(" Q) Quit");
@@ -105,28 +105,72 @@ namespace Capstone
 
         }
 
-        private void GetParkWithCampgrounds()
-        {
-            CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
-
-        }
-
         //Get Park Info
         private void GetParkInfo(int parkDictionaryKey)
         {
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
-            //Park park = campgroundDAL.GetParkInfo(Parks[parkDictionaryKey]);
+
+            campgroundDAL.GetParkInfo(Parks[parkDictionaryKey]);
+
+            Console.WriteLine();
 
             PrintCampgroundMenu();
+            string command = Console.ReadKey().ToString();
 
-            switch (switch_on)
+
+            switch (command)
             {
+                case command_ViewCampgrounds:
+                    GetCampgrounds(Parks[parkDictionaryKey]);
+                    break;
+                case command_SearchReservations:
+                    GetAvailableCampgroundReservations();
+                    break;
+                case command_ReturnToPreviousScreen:
+                    break;
                 default:
+                    Console.WriteLine("The command provided was not a valid command, please try again.");
+                    command = Console.ReadKey().ToString();
+                    break;
+
+            }
+
+
+
+        }
+
+        private void GetCampgrounds(string parkName)
+        {
+            CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
+            Dictionary<int, Campground> campgrounds = campgroundDAL.GetAllCampgroundsInPark(parkName);
+
+            foreach (KeyValuePair<int, Campground> campground in campgrounds)
+            {
+                Console.WriteLine($"{campground.Key + 1} {campground.Value.Name} {campground.Value.Open_From_MM} {campground.Value.Open_To_MM} {campground.Value.Daily_Fee}");
+            }
+
+            PrintCampgroundMenu();
+            string command = Console.ReadKey().ToString();
+
+            switch (command)
+            {
+                case command_SearchAvailableReservations:
+                    //Search Availabilities
+                    SearchCampgroundrAvailability();
+                    break;
+                case command_ReturnToPreviousScreen:
+                    break;
+                default:
+                    Console.WriteLine("The command provided was not a valid command, please try again.");
+                    command = Console.ReadKey().ToString();
+                    break;
             }
         }
 
+       
+
         //Availabilities
-        private void GetParkWithAvailableDates()
+        private void GetAvailableCampgroundReservations()
         {
 
         }
@@ -136,7 +180,7 @@ namespace Capstone
 
         }
 
-        private void SearchParkForAvailability()
+        private void SearchCampgroundrAvailability()
         {
 
         }

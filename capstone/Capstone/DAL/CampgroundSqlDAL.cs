@@ -5,13 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
 using Capstone.Models;
+using System.Configuration;
 
 namespace Capstone.DAL
 {
 
     public class CampgroundSqlDAL
     {
-        public string connectionString;
+        string connectionString = ConfigurationManager.ConnectionStrings["CapstoneDatabase"].ConnectionString;
         private const string SQL_GetParks = "select * from park order by name asc";
         private const string SQL_GetParkInfo = "select descript from park order by name asc";
 
@@ -55,11 +56,13 @@ namespace Capstone.DAL
 
         }
 
-        //public List<Campground> GetParkWithAvailableCampgrounds(string parkName)
-        //{
-        //    List<Campground> list = new List<Campground>();
+        public Dictionary<int,Campground> GetAllCampgroundsInPark(string parkName)
+        {
+            Dictionary<int, Campground> list = new Dictionary<int, Campground>();
 
-        //}
+            return list;
+
+        }
 
         public bool CampgroundAvailability(string campground, DateTime startDate, DateTime endDate)
         {
