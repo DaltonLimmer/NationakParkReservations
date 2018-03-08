@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Capstone.Models
 {
-    class Campground
+    public class Campground
     {
-        public int Campground_Id { get; set; }
-        public int Park_Id { get; set; }
+        public int CampgroundId { get; set; }
+        public int ParkId { get; set; }
         public string Name { get; set; }
         public int Open_From_MM { get; set; }
         public int Open_To_MM { get; set; }

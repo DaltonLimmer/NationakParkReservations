@@ -1,7 +1,7 @@
-DROP TABLE reservation;
-DROP TABLE site;
-DROP TABLE campground;
-DROP TABLE park;
+--DROP TABLE reservation;
+--DROP TABLE site;
+--DROP TABLE campground;
+--DROP TABLE park;
 
 CREATE TABLE park (
   park_id integer identity NOT NULL,
