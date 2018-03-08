@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
 using Capstone.Models;
+using System.Configuration;
 
 namespace Capstone.DAL
 {
@@ -81,7 +82,7 @@ namespace Capstone.DAL
 
         //As a user of the system, I need the ability to select a park that
         //my customer is visiting and see a list of all campgrounds for that available park.
-        public Dictionary<int, Campground> GetAllCampgroundsInPark(Park park)
+        public Dictionary<int, Campground> GetAllCampgroundsInPark(string parkName)
         {
             Dictionary<int, Campground> campgrounds = new Dictionary<int, Campground>();
             int count = 1;
@@ -93,7 +94,7 @@ namespace Capstone.DAL
                     conn.Open();
 
                     SqlCommand cmd = new SqlCommand(SQL_GetAllCampgroundsInPark, conn);
-                    cmd.Parameters.AddWithValue("@parkname", park.Name);
+                    cmd.Parameters.AddWithValue("@parkname", parkName);
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
