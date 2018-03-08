@@ -8,12 +8,19 @@ using Capstone.Models;
 
 namespace Capstone.DAL
 {
+
     public class CampgroundSqlDAL
     {
         public string connectionString;
-        private const string SQL_GetTeams = "SELECT * FROM Park";
+        private const string SQL_GetParks = "select * from park order by name asc";
+        private const string SQL_GetParkInfo = "select descript from park order by name asc";
 
-        
+        public Park GetParkInfo(string parkName)
+        {
+
+
+        }
+
         public List<Park> GetAllParksAlphabetically()
         {
             List<Park> parks = new List<Park>();
@@ -24,14 +31,14 @@ namespace Capstone.DAL
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(SQL_GetTeams, conn);
+                    SqlCommand cmd = new SqlCommand(SQL_GetParks, conn);
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     while (reader.Read())
                     {
-                        Team item = GetTeamsFromReader(reader);
-                        teams.Add(item);
+                        Park item = GetParksFromReader(reader);
+                        parks.Add(item);
                     }
 
                 }
@@ -83,5 +90,22 @@ namespace Capstone.DAL
 
         }
 
+        private Park GetParksFromReader(SqlDataReader reader)
+        {
+            Park item = new Park
+            {
+                ParkID = Convert.ToInt32(reader["park_id"]),
+                Name = Convert.ToString(reader["name"]),
+                Location = Convert.ToString(reader["location"]),
+                Establish_Date = Convert.ToDateTime(reader["establish_date"]),
+                Area = Convert.ToString(reader["area"]),
+                Visitors = Convert.ToInt32(reader["visitors"]),
+                Description = Convert.ToString(reader["description"]),
+
+            };
+
+            return item;
+
+        }
     }
 }
