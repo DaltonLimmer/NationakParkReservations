@@ -21,6 +21,7 @@ namespace Capstone.DAL
 
         }
 
+        
         public List<Park> GetAllParksAlphabetically()
         {
             List<Park> parks = new List<Park>();
