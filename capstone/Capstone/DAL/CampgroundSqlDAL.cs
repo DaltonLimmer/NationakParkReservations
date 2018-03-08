@@ -13,6 +13,7 @@ namespace Capstone.DAL
         public string connectionString;
         private const string SQL_GetTeams = "SELECT * FROM Park";
 
+        
         public List<Park> GetAllParksAlphabetically()
         {
             List<Park> parks = new List<Park>();
