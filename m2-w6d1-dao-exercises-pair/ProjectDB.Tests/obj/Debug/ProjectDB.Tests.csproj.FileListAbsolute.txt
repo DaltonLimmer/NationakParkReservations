@@ -1,0 +1,16 @@
+C:\Users\Byron Thompson\Workspace\team7-c-week6-pair-exercises\m2-w6d1-dao-exercises-pair\ProjectDB.Tests\obj\Debug\ProjectDB.Tests.csprojResolveAssemblyReference.cache
+C:\Users\Byron Thompson\Workspace\team7-c-week6-pair-exercises\m2-w6d1-dao-exercises-pair\ProjectDB.Tests\obj\Debug\ProjectDB.Tests.csproj.CoreCompileInputs.cache
+C:\Users\Byron Thompson\Workspace\team7-c-week6-pair-exercises\m2-w6d1-dao-exercises-pair\ProjectDB.Tests\bin\Debug\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll
+C:\Users\Byron Thompson\Workspace\team7-c-week6-pair-exercises\m2-w6d1-dao-exercises-pair\ProjectDB.Tests\bin\Debug\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll
+C:\Users\Byron Thompson\Workspace\team7-c-week6-pair-exercises\m2-w6d1-dao-exercises-pair\ProjectDB.Tests\bin\Debug\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
+C:\Users\Byron Thompson\Workspace\team7-c-week6-pair-exercises\m2-w6d1-dao-exercises-pair\ProjectDB.Tests\bin\Debug\ProjectDB.Tests.dll
+C:\Users\Byron Thompson\Workspace\team7-c-week6-pair-exercises\m2-w6d1-dao-exercises-pair\ProjectDB.Tests\bin\Debug\ProjectDB.Tests.pdb
+C:\Users\Byron Thompson\Workspace\team7-c-week6-pair-exercises\m2-w6d1-dao-exercises-pair\ProjectDB.Tests\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.dll
+C:\Users\Byron Thompson\Workspace\team7-c-week6-pair-exercises\m2-w6d1-dao-exercises-pair\ProjectDB.Tests\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll
+C:\Users\Byron Thompson\Workspace\team7-c-week6-pair-exercises\m2-w6d1-dao-exercises-pair\ProjectDB.Tests\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.xml
+C:\Users\Byron Thompson\Workspace\team7-c-week6-pair-exercises\m2-w6d1-dao-exercises-pair\ProjectDB.Tests\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml
+C:\Users\Byron Thompson\Workspace\team7-c-week6-pair-exercises\m2-w6d1-dao-exercises-pair\ProjectDB.Tests\obj\Debug\ProjectDB.Tests.dll
+C:\Users\Byron Thompson\Workspace\team7-c-week6-pair-exercises\m2-w6d1-dao-exercises-pair\ProjectDB.Tests\obj\Debug\ProjectDB.Tests.pdb
+C:\Users\Byron Thompson\Workspace\team7-c-week6-pair-exercises\m2-w6d1-dao-exercises-pair\ProjectDB.Tests\bin\Debug\ProjectDB.exe
+C:\Users\Byron Thompson\Workspace\team7-c-week6-pair-exercises\m2-w6d1-dao-exercises-pair\ProjectDB.Tests\bin\Debug\ProjectDB.pdb
+C:\Users\Byron Thompson\Workspace\team7-c-week6-pair-exercises\m2-w6d1-dao-exercises-pair\ProjectDB.Tests\bin\Debug\ProjectDB.exe.config

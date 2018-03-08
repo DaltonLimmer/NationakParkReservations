@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Capstone.Models
 {
-    class Campground
+    public class Campground
     {
         public int CampgroundId { get; set; }
         public int ParkId { get; set; }

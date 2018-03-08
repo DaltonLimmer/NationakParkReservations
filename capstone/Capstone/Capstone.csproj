@@ -49,6 +49,8 @@
     <Compile Include="Models\Park.cs" />
     <Compile Include="Models\Reservation.cs" />
     <Compile Include="Models\Site.cs" />
+    <Compile Include="ProgramCLI.cs" />
+    <Compile Include="CLIHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
