@@ -47,10 +47,16 @@ namespace Capstone
                         GetParkInfo(park);
                         break;
                     case command_SelectArches:
+                        park = int.Parse(command);
+                        GetParkInfo(park);
                         break;
                     case command_SelectCuyahoga:
+                        park = int.Parse(command);
+                        GetParkInfo(park);
                         break;
                     case command_Quit:
+                        park = int.Parse(command);
+                        GetParkInfo(park);
                         return;
                     default:
                         Console.WriteLine("The command provided was not a valid command, please try again.");
