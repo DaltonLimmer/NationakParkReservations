@@ -8,11 +8,7 @@ namespace Capstone.Models
 {
     class Site
     {
-        Park_ID
-        Name
-        Location
-        Establish_Date
-        Area
+        
 
 
     }

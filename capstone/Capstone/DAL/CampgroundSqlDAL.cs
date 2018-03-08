@@ -8,10 +8,12 @@ using Capstone.Models;
 
 namespace Capstone.DAL
 {
-    class CampgroundSqlDAL
-
-
+    public class CampgroundSqlDAL
     {
+        public Park GetParkInfo(string parkName)
+        {
+
+        }
         public List<Campground> GetParkWithAvailableCampgrounds(string parkName)
         {
 

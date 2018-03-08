@@ -1,4 +1,6 @@
 ﻿using Capstone;
+using Capstone.DAL;
+using Capstone.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,16 +33,18 @@ namespace Capstone
 
         public void RunCLI()
         {
-            bool stillRunning = true;
+            PrintMainMenu();
 
-            while (stillRunning)
+            while (true)
             {
                 ConsoleKeyInfo userInput = Console.ReadKey();
+                string command = userInput.ToString();
 
-                switch (userInput.ToString())
+                switch (command)
                 {
                     case command_SelectAcadia:
-
+                        int park = int.Parse(command);
+                        GetParkInfo(park);
                         break;
                     case command_SelectArches:
                         break;
@@ -55,6 +59,7 @@ namespace Capstone
             }
         }
 
+        //Menus
         private void PrintMainMenu()
         {
             Console.WriteLine("Select a Park for further Details");
@@ -90,7 +95,6 @@ namespace Capstone
         // Search
         private void GetAllParks()
         {
-
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
 
         }
@@ -101,11 +105,16 @@ namespace Capstone
 
         }
 
-        //Availabilities
-        private void GetParkInfo()
+        //Get Park Info
+        private void GetParkInfo(int parkDictionaryKey)
         {
+            CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
+            Park park = campgroundDAL.GetParkInfo(Parks[parkDictionaryKey]);
+
 
         }
+
+        //Availabilities
         private void GetParkWithAvailableDates()
         {
 
