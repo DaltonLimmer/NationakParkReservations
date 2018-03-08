@@ -1,4 +1,4 @@
-﻿using Capstone.DAL;
+﻿using Capstone;
 using System;
 using System.Collections.Generic;
 using System.Linq;

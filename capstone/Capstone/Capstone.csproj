@@ -45,6 +45,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DAL\CampgroundSqlDAL.cs" />
+    <Compile Include="Models\Campground.cs" />
+    <Compile Include="Models\Park.cs" />
+    <Compile Include="Models\Reservation.cs" />
+    <Compile Include="Models\Site.cs" />
     <Compile Include="ProgramCLI.cs" />
     <Compile Include="CLIHelper.cs" />
     <Compile Include="Program.cs" />
@@ -53,9 +57,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
