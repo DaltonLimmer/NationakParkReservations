@@ -13,7 +13,7 @@ namespace Capstone.Models
         Location
         Establish_Date
         Area
-        
+
 
     }
 }
