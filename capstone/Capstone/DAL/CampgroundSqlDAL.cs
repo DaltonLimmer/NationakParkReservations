@@ -5,13 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
 using Capstone.Models;
+using System.Configuration;
 
 namespace Capstone.DAL
 {
 
     public class CampgroundSqlDAL
     {
-        string connectionString = ConfigurationManager.ConnectionStrings["CapstoneDatabase"].ConnectionString;
+        //string connectionString = ConfigurationManager.ConnectionStrings["Campground"].ConnectionString;
+        private const string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Campground;Integrated Security = True";
         private const string SQL_GetParks = "select * from park order by name asc";
         private const string SQL_GetParkInfo = "select name, location, establish_date, area, visitors, description from park";
         private const string SQL_GetAllCampgroundsInPark = "select campground.name from campground join park on park.park_id = campground.park_id where park.name = @parkname";
@@ -81,7 +83,7 @@ namespace Capstone.DAL
 
         //As a user of the system, I need the ability to select a park that
         //my customer is visiting and see a list of all campgrounds for that available park.
-        public Dictionary<int, Campground> GetAllCampgroundsInPark(Park park)
+        public Dictionary<int, Campground> GetAllCampgroundsInPark(string parkName)
         {
             Dictionary<int, Campground> campgrounds = new Dictionary<int, Campground>();
             int count = 1;
@@ -93,7 +95,7 @@ namespace Capstone.DAL
                     conn.Open();
 
                     SqlCommand cmd = new SqlCommand(SQL_GetAllCampgroundsInPark, conn);
-                    cmd.Parameters.AddWithValue("@parkname", park.Name);
+                    cmd.Parameters.AddWithValue("@parkname", parkName);
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -135,20 +137,20 @@ namespace Capstone.DAL
             return true;
         }
 
-        //BONUS: As a user of the system, I would like the ability to see a list
-        //of all upcoming reservations within the next 30 days for a selected national park.
-        public bool SearchParkForMadeReservations(string parkName)
-        {
+        ////BONUS: As a user of the system, I would like the ability to see a list
+        ////of all upcoming reservations within the next 30 days for a selected national park.
+        //public bool SearchParkForMadeReservations(string parkName)
+        //{
             
-        }
+        //}
 
-        //Provide an advanced search functionality allowing users to indicate any
-        //requirements they have for maximum occupancy, requires wheelchair 
-        //accessible site, an rv and its length if required, and if a utility hookup is necessary.
-        public List<Site> AdvancedSearch(int maxOccupancy, bool wheelchairAccessible, bool hasRV, int length, bool utilityHookupRequired)
-        {
+        ////Provide an advanced search functionality allowing users to indicate any
+        ////requirements they have for maximum occupancy, requires wheelchair 
+        ////accessible site, an rv and its length if required, and if a utility hookup is necessary.
+        //public List<Site> AdvancedSearch(int maxOccupancy, bool wheelchairAccessible, bool hasRV, int length, bool utilityHookupRequired)
+        //{
             
-        }
+        //}
 
         private Park GetParksFromReader(SqlDataReader reader)
         {

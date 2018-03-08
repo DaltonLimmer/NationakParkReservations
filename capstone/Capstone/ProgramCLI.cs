@@ -110,7 +110,14 @@ namespace Capstone
         {
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
 
-            campgroundDAL.GetParkInfo(Parks[parkDictionaryKey]);
+            Park park = campgroundDAL.GetParkInfo(Parks[parkDictionaryKey]);
+
+            Console.Clear();
+            Console.WriteLine($"{park.Name}");
+            Console.WriteLine($"Location: {park.Location}");
+            Console.WriteLine($"Established: {park.Establish_Date.ToShortDateString()}");
+            Console.WriteLine($"Area: {park.Area} sq km");
+            Console.WriteLine($"Annual Visitors: {park.Visitors}");
 
             Console.WriteLine();
 
