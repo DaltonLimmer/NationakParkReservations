@@ -17,8 +17,9 @@ namespace Capstone.DAL
 
         public Park GetParkInfo(string parkName)
         {
+            Park park = new Park();
 
-
+            return park;
         }
 
         
@@ -50,46 +51,47 @@ namespace Capstone.DAL
                 throw;
             }
 
-            return teams;
+            return parks;
 
         }
 
-        public List<Campground> GetParkWithAvailableCampgrounds(string parkName)
-        {
+        //public List<Campground> GetParkWithAvailableCampgrounds(string parkName)
+        //{
+        //    List<Campground> list = new List<Campground>();
 
-        }
+        //}
 
         public bool CampgroundAvailability(string campground, DateTime startDate, DateTime endDate)
         {
-
+            return true;
         }
 
         public bool BookReservation(string personName, DateTime startDate, DateTime endDate)
         {
-
+            return true;
         }
 
         //As a user of the system, I want the ability to select a park and search for campsite
         //availability across the entire park so that I can make a reservation.
         public bool SearchParkForAvailability(string parkName, DateTime startDate, DateTime endDate)
         {
-
+            return true;
         }
 
         //BONUS: As a user of the system, I would like the ability to see a list
         //of all upcoming reservations within the next 30 days for a selected national park.
         public bool SearchParkForMadeReservations(string parkName)
         {
-
+            return true;
         }
 
         //Provide an advanced search functionality allowing users to indicate any
         //requirements they have for maximum occupancy, requires wheelchair 
         //accessible site, an rv and its length if required, and if a utility hookup is necessary.
-        public List<Site> AdvancedSearch(int maxOccupancy, bool wheelchairAccessible, bool hasRV, int length, bool utilityHookupRequired)
-        {
-
-        }
+        //public List<Site> AdvancedSearch(int maxOccupancy, bool wheelchairAccessible, bool hasRV, int length, bool utilityHookupRequired)
+        //{
+        //    List<Site> site = new List<Site>();
+        //}
 
         private Park GetParksFromReader(SqlDataReader reader)
         {

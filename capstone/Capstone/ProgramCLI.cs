@@ -115,9 +115,14 @@ namespace Capstone
         private void GetParkInfo(int parkDictionaryKey)
         {
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
-            Park park = campgroundDAL.GetParkInfo(Parks[parkDictionaryKey]);
+            //Park park = campgroundDAL.GetParkInfo(Parks[parkDictionaryKey]);
 
+            PrintCampgroundMenu();
 
+            switch (switch_on)
+            {
+                default:
+            }
         }
 
         //Availabilities
