@@ -13,13 +13,37 @@ namespace Capstone.DAL
     {
         public string connectionString;
         private const string SQL_GetParks = "select * from park order by name asc";
-        private const string SQL_GetParkInfo = "select descript from park order by name asc";
+        private const string SQL_GetParkInfo = "select name, location, establish_date, area, visitors, description from park";
+        private const string SQL_GetAllCampgroundsInPark = "select campground.name from campground join park on park.park_id = campground.park_id where park.name = @parkname";
 
         public Park GetParkInfo(string parkName)
         {
             Park park = new Park();
 
-            return park;
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(connectionString))
+                    {
+                        conn.Open();
+
+                        SqlCommand cmd = new SqlCommand(SQL_GetParks, conn);
+
+                        SqlDataReader reader = cmd.ExecuteReader();
+
+                        while (reader.Read())
+                        {
+                            park = GetParksFromReader(reader);
+                        }
+
+                    }
+                }
+                catch (SqlException)
+                {
+
+                    throw;
+                }
+
+                return park;
         }
 
         
@@ -55,12 +79,45 @@ namespace Capstone.DAL
 
         }
 
-        //public List<Campground> GetParkWithAvailableCampgrounds(string parkName)
-        //{
-        //    List<Campground> list = new List<Campground>();
+        //As a user of the system, I need the ability to select a park that
+        //my customer is visiting and see a list of all campgrounds for that available park.
+        public Dictionary<int, Campground> GetAllCampgroundsInPark(Park park)
+        {
+            Dictionary<int, Campground> campgrounds = new Dictionary<int, Campground>();
+            int count = 1;
 
-        //}
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
 
+                    SqlCommand cmd = new SqlCommand(SQL_GetAllCampgroundsInPark, conn);
+                    cmd.Parameters.AddWithValue("@parkname", park.Name);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        Campground item = GetCampgroundsFromReader(reader);
+                        campgrounds.Add(count, item);
+                        count++;
+                    }
+
+                }
+            }
+            catch (SqlException)
+            {
+
+                throw;
+            }
+
+            return campgrounds;
+
+        }
+
+        //As a user of the system, I need the ability to select a campground and
+        //search for date availability so that I can make a reservation.
         public bool CampgroundAvailability(string campground, DateTime startDate, DateTime endDate)
         {
             return true;
@@ -82,16 +139,16 @@ namespace Capstone.DAL
         //of all upcoming reservations within the next 30 days for a selected national park.
         public bool SearchParkForMadeReservations(string parkName)
         {
-            return true;
+            
         }
 
         //Provide an advanced search functionality allowing users to indicate any
         //requirements they have for maximum occupancy, requires wheelchair 
         //accessible site, an rv and its length if required, and if a utility hookup is necessary.
-        //public List<Site> AdvancedSearch(int maxOccupancy, bool wheelchairAccessible, bool hasRV, int length, bool utilityHookupRequired)
-        //{
-        //    List<Site> site = new List<Site>();
-        //}
+        public List<Site> AdvancedSearch(int maxOccupancy, bool wheelchairAccessible, bool hasRV, int length, bool utilityHookupRequired)
+        {
+            
+        }
 
         private Park GetParksFromReader(SqlDataReader reader)
         {
@@ -104,6 +161,23 @@ namespace Capstone.DAL
                 Area = Convert.ToString(reader["area"]),
                 Visitors = Convert.ToInt32(reader["visitors"]),
                 Description = Convert.ToString(reader["description"]),
+
+            };
+
+            return item;
+
+        }
+
+        private Campground GetCampgroundsFromReader(SqlDataReader reader)
+        {
+            Campground item = new Campground
+            {
+                CampgroundId = Convert.ToInt32(reader["campground_id"]),
+                ParkId = Convert.ToInt32(reader["park_id"]),
+                Name = Convert.ToString(reader["name"]),
+                Open_From_MM = Convert.ToInt32(reader["open_from_mm"]),
+                Open_To_MM = Convert.ToInt32(reader["open_to_mm"]),
+                Daily_Fee = Convert.ToDouble(reader["daily_fee"]),
 
             };
 
