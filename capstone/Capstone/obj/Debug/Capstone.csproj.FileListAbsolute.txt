@@ -1,1 +1,3 @@
 C:\Users\Dalton Limmer\workspace\team7-c-week6-pair-exercises\capstone\Capstone\obj\Debug\Capstone.csproj.CoreCompileInputs.cache
+C:\Users\Byron Thompson\Workspace\team7-c-week6-pair-exercises\capstone\Capstone\obj\Debug\Capstone.csprojResolveAssemblyReference.cache
+C:\Users\Byron Thompson\Workspace\team7-c-week6-pair-exercises\capstone\Capstone\obj\Debug\Capstone.csproj.CoreCompileInputs.cache
