@@ -25,7 +25,7 @@ namespace Capstone
         {
             {1, "Acadia" },
             {2, "Arches" },
-            {3, "Cuyahoga National Valley" }
+            {3, "Cuyahoga Valley" }
         };
         
 
@@ -121,8 +121,9 @@ namespace Capstone
 
             Console.WriteLine();
 
-            PrintCampgroundMenu();
-            string command = Console.ReadKey().ToString();
+            PrintParkInfoMenu();
+            ConsoleKeyInfo userInput = Console.ReadKey();
+            string command = userInput.KeyChar.ToString();
 
 
             switch (command)
@@ -131,15 +132,15 @@ namespace Capstone
                     GetCampgrounds(Parks[parkDictionaryKey]);
                     break;
                 case command_SearchReservations:
-                    GetAvailableCampgroundReservations();
+                    GetCampgroundAvailability(Parks[parkDictionaryKey]);
                     break;
                 case command_ReturnToPreviousScreen:
+
                     break;
                 default:
                     Console.WriteLine("The command provided was not a valid command, please try again.");
                     command = Console.ReadKey().ToString();
                     break;
-
             }
 
 
@@ -151,11 +152,14 @@ namespace Capstone
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
             Dictionary<int, Campground> campgrounds = campgroundDAL.GetAllCampgroundsInPark(parkName);
 
+            Console.Clear();
+            Console.WriteLine();
             foreach (KeyValuePair<int, Campground> campground in campgrounds)
             {
                 Console.WriteLine($"{campground.Key + 1} {campground.Value.Name} {campground.Value.Open_From_MM} {campground.Value.Open_To_MM} {campground.Value.Daily_Fee}");
             }
 
+            Console.WriteLine();
             PrintCampgroundMenu();
             string command = Console.ReadKey().ToString();
 
@@ -163,9 +167,10 @@ namespace Capstone
             {
                 case command_SearchAvailableReservations:
                     //Search Availabilities
-                    SearchCampgroundrAvailability();
+                    GetCampgroundAvailability(parkName);
                     break;
                 case command_ReturnToPreviousScreen:
+
                     break;
                 default:
                     Console.WriteLine("The command provided was not a valid command, please try again.");
@@ -174,23 +179,29 @@ namespace Capstone
             }
         }
 
-       
-
-        //Availabilities
-        private void GetAvailableCampgroundReservations()
+        private void GetCampgroundAvailability(string parkName)
         {
+            CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
+            string campground = CLIHelper.GetString("Enter campground:");
+            DateTime startDate = CLIHelper.GetDateTime("Enter start date:");
+            DateTime endDate = CLIHelper.GetDateTime("Enter end date:");
 
+            campgroundDAL.CampgroundAvailability(campground, startDate, endDate);
         }
+
+
+        ////Availabilities
+        //private void GetAvailableCampgroundReservations()
+        //{
+
+        //}
 
         private void GetParkCampsiteAdvancedSearch()
         {
 
         }
 
-        private void SearchCampgroundrAvailability()
-        {
-
-        }
+        
 
         //Booking
         private void BookReservation()

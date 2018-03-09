@@ -16,7 +16,7 @@ namespace Capstone.DAL
         private const string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Campground;Integrated Security = True";
         private const string SQL_GetParks = "select * from park order by name asc";
         private const string SQL_GetParkInfo = "select name, location, establish_date, area, visitors, description from park";
-        private const string SQL_GetAllCampgroundsInPark = "select campground.name from campground join park on park.park_id = campground.park_id where park.name = @parkname";
+        private const string SQL_GetCamgroundByPark = "SELECT * FROM campground JOIN park ON park.park_id = campground.park_id WHERE  park.name = @parkName;";
 
         public Park GetParkInfo(string parkName)
         {
@@ -94,14 +94,14 @@ namespace Capstone.DAL
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(SQL_GetAllCampgroundsInPark, conn);
+                    SqlCommand cmd = new SqlCommand(SQL_GetCamgroundByPark, conn);
                     cmd.Parameters.AddWithValue("@parkname", parkName);
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     while (reader.Read())
                     {
-                        Campground item = GetCampgroundsFromReader(reader);
+                        Campground item = GetCampgroundFromReader(reader);
                         campgrounds.Add(count, item);
                         count++;
                     }
@@ -122,6 +122,7 @@ namespace Capstone.DAL
         //search for date availability so that I can make a reservation.
         public bool CampgroundAvailability(string campground, DateTime startDate, DateTime endDate)
         {
+
             return true;
         }
 
@@ -170,7 +171,7 @@ namespace Capstone.DAL
 
         }
 
-        private Campground GetCampgroundsFromReader(SqlDataReader reader)
+        private Campground GetCampgroundFromReader(SqlDataReader reader)
         {
             Campground item = new Campground
             {
