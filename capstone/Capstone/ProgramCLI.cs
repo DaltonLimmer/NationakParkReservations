@@ -111,15 +111,6 @@ namespace Capstone
         }
 
 
-      
-
-        // Search
-        private void GetAllParks()
-        {
-            CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
-
-        }
-
         //Get Park Info
         private void GetParkInfo(int parkDictionaryKey)
         {
@@ -206,7 +197,12 @@ namespace Capstone
             DateTime startDate = CLIHelper.GetDateTime("Enter start date:");
             DateTime endDate = CLIHelper.GetDateTime("Enter end date:");
 
-            campgroundDAL.GetCampgroundAvailability(campgrounds[campground].Name, startDate, endDate);
+            var availableSites = campgroundDAL.GetCampgroundAvailability(campgrounds[campground].Name, startDate, endDate);
+            foreach (KeyValuePair<int, Site> site in availableSites)
+            {
+                double cost = campgrounds[campground].Daily_Fee;
+                Console.WriteLine($"{site.Value.SiteID} {site.Value.MaxOccupancy} {site.Value.MaxRVLength} {site.Value.UtilityHookups} {cost:c}");
+            }
 
         }
 
