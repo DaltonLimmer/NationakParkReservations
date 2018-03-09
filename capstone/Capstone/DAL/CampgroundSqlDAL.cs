@@ -94,7 +94,7 @@ namespace Capstone.DAL
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(SQL_GetCamgroundByPark, conn);
+                    SqlCommand cmd = new SqlCommand(SQL_GetCamgroundsByPark, conn);
                     cmd.Parameters.AddWithValue("@parkname", parkName);
 
                     SqlDataReader reader = cmd.ExecuteReader();

@@ -19,7 +19,7 @@ namespace Capstone
         private const string command_ViewCampgrounds = "1";
         private const string command_SearchReservations = "2";
         private const string command_ReturnToPreviousScreen = "3";
-        private const string command_SearchAvailableReservations = "1";
+        private const string command_SearchForAvailableReservations = "1";
         private const string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Campground;Integrated Security = True";
         private Dictionary<int, string> Parks = new Dictionary<int, string>()
         {
@@ -42,9 +42,6 @@ namespace Capstone
             {11, "November" },
             {12, "December" }
         };
-
-
-
 
         public void RunCLI()
         {
@@ -113,6 +110,8 @@ namespace Capstone
 
         }
 
+      
+
         // Search
         private void GetAllParks()
         {
@@ -171,7 +170,7 @@ namespace Capstone
             Console.WriteLine();
             foreach (KeyValuePair<int, Campground> campground in campgrounds)
             {
-                Console.WriteLine($"{campground.Key + 1} {campground.Value.Name} {campground.Value.Open_From_MM} {campground.Value.Open_To_MM} {campground.Value.Daily_Fee}");
+                Console.WriteLine($"#{campground.Key} {campground.Value.Name} {Months[campground.Value.Open_From_MM]} {Months[campground.Value.Open_To_MM]} {campground.Value.Daily_Fee}");
             }
 
             Console.WriteLine();
@@ -180,9 +179,11 @@ namespace Capstone
 
             switch (command)
             {
-                case command_SearchAvailableReservations:
+                case command_SearchForAvailableReservations:
                     //Search Availabilities
-                    GetCampgroundAvailability(parkName);
+                    GetCampgrounds(parkName);
+                    Console.WriteLine();
+                    GetCampgroundAvailability(campgrounds);
                     break;
                 case command_ReturnToPreviousScreen:
 
@@ -194,14 +195,15 @@ namespace Capstone
             }
         }
 
-        private void GetCampgroundAvailability(string parkName)
+        private void GetCampgroundAvailability(Dictionary<int, Campground> campgrounds)
         {
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
-            string campground = CLIHelper.GetString("Enter campground:");
+            int campground = CLIHelper.GetInteger("Which Campground:");
             DateTime startDate = CLIHelper.GetDateTime("Enter start date:");
             DateTime endDate = CLIHelper.GetDateTime("Enter end date:");
 
-            campgroundDAL.CampgroundAvailability(campground, startDate, endDate);
+            campgroundDAL.CampgroundAvailability(campgrounds[campground].Name, startDate, endDate);
+
         }
 
 
