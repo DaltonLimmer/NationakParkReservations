@@ -16,7 +16,13 @@ namespace Capstone.DAL
         private const string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Campground;Integrated Security = True";
         private const string SQL_GetParks = "select * from park order by name asc";
         private const string SQL_GetParkInfo = "select name, location, establish_date, area, visitors, description from park";
-        private const string SQL_GetCamgroundsByPark = "SELECT * FROM campground JOIN park ON park.park_id = campground.park_id WHERE  park.name = @parkName;";
+        private const string SQL_GetCamgroundsByPark = "SELECT * FROM campground JOIN park ON park.park_id = campground.park_id" +
+        " WHERE  park.name = @parkName;";
+        private const string SQL_GetAvailableDatesByCampground = "select * from reservation JOIN site " +
+        "ON site.site_id = reservation.site_id JOIN campground ON site.campground_id = campground.campground_id " +
+        "WHERE campground.name = @campground";
+        private const string SQL_GetSitesbyCampground = "select site.site_id from site join campground " +
+        "ON campground.campground_id = site.campground_id where campground.name = @campground";
 
         public Park GetParkInfo(string parkName)
         {
@@ -59,7 +65,7 @@ namespace Capstone.DAL
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(SQL_GetParks, conn);
+                    SqlCommand cmd = new SqlCommand(SQL_GetAvailableDatesByCampground, conn);
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -120,11 +126,79 @@ namespace Capstone.DAL
 
         //As a user of the system, I need the ability to select a campground and
         //search for date availability so that I can make a reservation.
-        public bool CampgroundAvailability(string campground, DateTime startDate, DateTime endDate)
+        public List<Site> CampgroundAvailability(string campground, DateTime startDate, DateTime endDate)
         {
+            List<Reservation> reservations = new List<Reservation>();
+            List<Site> sites = new List<Site>();
+            bool isTrue = true;
 
-            return true;
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand(SQL_GetParks, conn);
+                    cmd.Parameters.AddWithValue("@campground", campground);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        Reservation item = GetReservationsFromReader(reader);
+                        reservations.Add(item);
+                    }
+
+                }
+            }
+            catch (SqlException)
+            {
+
+                throw;
+            }
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand(SQL_GetSitesbyCampground, conn);
+                    cmd.Parameters.AddWithValue("@campground", campground);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        Site item = GetSitesFromReader(reader);
+                        sites.Add(item);
+                    }
+
+                }
+            }
+            catch (SqlException)
+            {
+
+                throw;
+            }
+
+            foreach (var reservation in reservations)
+            {
+                if ((startDate < reservation.ToDate) && (reservation.FromDate < endDate))
+                {
+
+                }
+
+            }
+
+            if (reservations.Count > 0)
+            {
+                isTrue = false;
+            }
+
         }
+
+    
 
         public bool BookReservation(string personName, DateTime startDate, DateTime endDate)
         {
@@ -140,18 +214,18 @@ namespace Capstone.DAL
 
         ////BONUS: As a user of the system, I would like the ability to see a list
         ////of all upcoming reservations within the next 30 days for a selected national park.
-        //public bool SearchParkForMadeReservations(string parkName)
-        //{
+        public bool SearchParkForMadeReservations(string parkName)
+        {
 
-        //}
+        }
 
         ////Provide an advanced search functionality allowing users to indicate any
         ////requirements they have for maximum occupancy, requires wheelchair 
         ////accessible site, an rv and its length if required, and if a utility hookup is necessary.
-        //public List<Site> AdvancedSearch(int maxOccupancy, bool wheelchairAccessible, bool hasRV, int length, bool utilityHookupRequired)
-        //{
+        public List<Site> AdvancedSearch(int maxOccupancy, bool wheelchairAccessible, bool hasRV, int length, bool utilityHookupRequired)
+        {
 
-        //}
+        }
 
         private Park GetParksFromReader(SqlDataReader reader)
         {
@@ -181,6 +255,41 @@ namespace Capstone.DAL
                 Open_From_MM = Convert.ToInt32(reader["open_from_mm"]),
                 Open_To_MM = Convert.ToInt32(reader["open_to_mm"]),
                 Daily_Fee = Convert.ToDouble(reader["daily_fee"]),
+
+            };
+
+            return item;
+
+        }
+
+        private Reservation GetReservationsFromReader(SqlDataReader reader)
+        {
+            Reservation item = new Reservation
+            {
+                ReservationID = Convert.ToInt32(reader["reservation_id"]),
+                SiteID = Convert.ToInt32(reader["site_id"]),
+                Name = Convert.ToString(reader["name"]),
+                FromDate = Convert.ToDateTime(reader["from_date"]),
+                ToDate = Convert.ToDateTime(reader["to_date"]),
+                CreateDate = Convert.ToDateTime(reader["create_date"]),
+
+            };
+
+            return item;
+
+        }
+
+        private Site GetSitesFromReader(SqlDataReader reader)
+        {
+            Site item = new Site
+            {
+                SiteID = Convert.ToInt32(reader["site_id"]),
+                CampgroundID = Convert.ToInt32(reader["campground_id"]),
+                SiteNumber = Convert.ToInt32(reader["site_number"]),
+                MaxOccupancy = Convert.ToInt32(reader["max_occupancy"]),
+                WheelchairAccess = Convert.ToBoolean(reader["accessible"]),
+                MaxRVLength = Convert.ToInt32(reader["max_rv_length"]),
+                UtilityHookups = Convert.ToBoolean(reader["utilities"]),
 
             };
 
