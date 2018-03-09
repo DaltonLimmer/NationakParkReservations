@@ -16,7 +16,8 @@ namespace Capstone.DAL
         private const string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Campground;Integrated Security = True";
         private const string SQL_GetParks = "select * from park order by name asc";
         private const string SQL_GetParkInfo = "select name, location, establish_date, area, visitors, description from park";
-        private const string SQL_GetCamgroundByPark = "SELECT * FROM campground JOIN park ON park.park_id = campground.park_id WHERE  park.name = @parkName;";
+        private const string SQL_GetAllCampgroundsInPark = "select campground.name from campground join park on park.park_id = campground.park_id where park.name = @parkname";
+        private const string SQL_CampgroundAvailability = "";
 
         public Park GetParkInfo(string parkName)
         {
@@ -94,14 +95,14 @@ namespace Capstone.DAL
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(SQL_GetCamgroundByPark, conn);
+                    SqlCommand cmd = new SqlCommand(SQL_GetAllCampgroundsInPark, conn);
                     cmd.Parameters.AddWithValue("@parkname", parkName);
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     while (reader.Read())
                     {
-                        Campground item = GetCampgroundFromReader(reader);
+                        Campground item = GetCampgroundsFromReader(reader);
                         campgrounds.Add(count, item);
                         count++;
                     }
@@ -126,6 +127,8 @@ namespace Capstone.DAL
             return true;
         }
 
+        //As a user of the system, once I find a campsite that is open during the
+        //time window I am looking for, I need the ability to book a reservation at a selected campsite.
         public bool BookReservation(string personName, DateTime startDate, DateTime endDate)
         {
             return true;
@@ -140,18 +143,19 @@ namespace Capstone.DAL
 
         ////BONUS: As a user of the system, I would like the ability to see a list
         ////of all upcoming reservations within the next 30 days for a selected national park.
-        //public bool SearchParkForMadeReservations(string parkName)
-        //{
-            
-        //}
+        public bool SearchParkForMadeReservations(string parkName)
+        {
+            return true;
+        }
 
         ////Provide an advanced search functionality allowing users to indicate any
         ////requirements they have for maximum occupancy, requires wheelchair 
         ////accessible site, an rv and its length if required, and if a utility hookup is necessary.
-        //public List<Site> AdvancedSearch(int maxOccupancy, bool wheelchairAccessible, bool hasRV, int length, bool utilityHookupRequired)
-        //{
-            
-        //}
+        public List<Site> AdvancedSearch(int maxOccupancy, bool wheelchairAccessible, bool hasRV, int length, bool utilityHookupRequired)
+        {
+            List<Site> site = new List<Site>();
+            return site;
+        }
 
         private Park GetParksFromReader(SqlDataReader reader)
         {
@@ -171,7 +175,7 @@ namespace Capstone.DAL
 
         }
 
-        private Campground GetCampgroundFromReader(SqlDataReader reader)
+        private Campground GetCampgroundsFromReader(SqlDataReader reader)
         {
             Campground item = new Campground
             {
