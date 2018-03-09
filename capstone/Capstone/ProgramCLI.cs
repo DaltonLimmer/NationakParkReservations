@@ -132,7 +132,7 @@ namespace Capstone
                     GetCampgrounds(Parks[parkDictionaryKey]);
                     break;
                 case command_SearchReservations:
-                    GetCampgroundAvailability();
+                    GetCampgroundAvailability(Parks[parkDictionaryKey]);
                     break;
                 case command_ReturnToPreviousScreen:
 
