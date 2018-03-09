@@ -18,7 +18,8 @@ namespace Capstone.DAL
         private const string SQL_GetParkInfo = "select name, location, establish_date, area, visitors, description from park";
         private const string SQL_GetCamgroundsByPark = "SELECT * FROM campground JOIN park ON park.park_id = campground.park_id" +
         " WHERE  park.name = @parkName;";
-        private const string SQL_GetAvailableDatesByCampground = "select * from reservation JOIN site " +
+        private const string SQL_GetCamgroundsByName = "SELECT * FROM campground WHERE campground.name = @campgroundName";
+        private const string SQL_GetReservationsByCampground = "select * from reservation JOIN site " +
         "ON site.site_id = reservation.site_id JOIN campground ON site.campground_id = campground.campground_id " +
         "WHERE campground.name = @campground";
         private const string SQL_GetSitesbyCampground = "select site.site_id from site join campground " +
@@ -65,7 +66,7 @@ namespace Capstone.DAL
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(SQL_GetAvailableDatesByCampground, conn);
+                    SqlCommand cmd = new SqlCommand(SQL_GetParks, conn);
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -126,27 +127,27 @@ namespace Capstone.DAL
 
         //As a user of the system, I need the ability to select a campground and
         //search for date availability so that I can make a reservation.
-        public List<Site> CampgroundAvailability(string campground, DateTime startDate, DateTime endDate)
+        public Dictionary<int, Site> GetCampgroundAvailability(string campgroundName, DateTime startDate, DateTime endDate)
         {
-            List<Reservation> reservations = new List<Reservation>();
-            List<Site> sites = new List<Site>();
-            bool isTrue = true;
+            Dictionary<int, Reservation> reservations = new Dictionary<int, Reservation>();
+            Dictionary<int, Site> availableSites = new Dictionary<int, Site>();
 
+            //GetReservationsForCampground
             try
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(SQL_GetParks, conn);
-                    cmd.Parameters.AddWithValue("@campground", campground);
+                    SqlCommand cmd = new SqlCommand(SQL_GetReservationsByCampground, conn);
+                    cmd.Parameters.AddWithValue("@campground", campgroundName);
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     while (reader.Read())
                     {
                         Reservation item = GetReservationsFromReader(reader);
-                        reservations.Add(item);
+                        reservations.Add(item.SiteID, item);
                     }
 
                 }
@@ -157,6 +158,7 @@ namespace Capstone.DAL
                 throw;
             }
 
+            //GetSitesForCampground
             try
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
@@ -164,14 +166,14 @@ namespace Capstone.DAL
                     conn.Open();
 
                     SqlCommand cmd = new SqlCommand(SQL_GetSitesbyCampground, conn);
-                    cmd.Parameters.AddWithValue("@campground", campground);
+                    cmd.Parameters.AddWithValue("@campground", campgroundName);
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     while (reader.Read())
                     {
                         Site item = GetSitesFromReader(reader);
-                        sites.Add(item);
+                        availableSites.Add(item.SiteID, item);
                     }
 
                 }
@@ -182,20 +184,14 @@ namespace Capstone.DAL
                 throw;
             }
 
-            foreach (var reservation in reservations)
+            foreach (KeyValuePair<int,Reservation> reservation in reservations)
             {
-                if ((startDate < reservation.ToDate) && (reservation.FromDate < endDate))
+                if ((startDate < reservation.Value.ToDate) && (reservation.Value.FromDate < endDate))
                 {
-
+                    availableSites.Remove(reservation.Value.SiteID);
                 }
-
             }
-
-            if (reservations.Count > 0)
-            {
-                isTrue = false;
-            }
-
+            return availableSites;
         }
 
     
@@ -212,20 +208,20 @@ namespace Capstone.DAL
             return true;
         }
 
-        ////BONUS: As a user of the system, I would like the ability to see a list
-        ////of all upcoming reservations within the next 30 days for a selected national park.
-        public bool SearchParkForMadeReservations(string parkName)
-        {
+        //////BONUS: As a user of the system, I would like the ability to see a list
+        //////of all upcoming reservations within the next 30 days for a selected national park.
+        //public bool SearchParkForMadeReservations(string parkName)
+        //{
 
-        }
+        //}
 
         ////Provide an advanced search functionality allowing users to indicate any
         ////requirements they have for maximum occupancy, requires wheelchair 
         ////accessible site, an rv and its length if required, and if a utility hookup is necessary.
-        public List<Site> AdvancedSearch(int maxOccupancy, bool wheelchairAccessible, bool hasRV, int length, bool utilityHookupRequired)
-        {
+        //public List<Site> AdvancedSearch(int maxOccupancy, bool wheelchairAccessible, bool hasRV, int length, bool utilityHookupRequired)
+        //{
 
-        }
+        //}
 
         private Park GetParksFromReader(SqlDataReader reader)
         {

@@ -110,6 +110,7 @@ namespace Capstone
 
         }
 
+
       
 
         // Search
@@ -146,7 +147,7 @@ namespace Capstone
                     GetCampgrounds(Parks[parkDictionaryKey]);
                     break;
                 case command_SearchReservations:
-                    GetCampgroundAvailability(Parks[parkDictionaryKey]);
+                    //GetCampgroundAvailability();
                     break;
                 case command_ReturnToPreviousScreen:
 
@@ -175,13 +176,16 @@ namespace Capstone
 
             Console.WriteLine();
             PrintCampgroundMenu();
-            string command = Console.ReadKey().ToString();
+
+            ConsoleKeyInfo userInput = Console.ReadKey();
+            string command = userInput.KeyChar.ToString();
 
             switch (command)
             {
                 case command_SearchForAvailableReservations:
                     //Search Availabilities
-                    GetCampgrounds(parkName);
+                    //GetCampgrounds(parkName);
+                    Console.WriteLine("Enter campground 1-3");
                     Console.WriteLine();
                     GetCampgroundAvailability(campgrounds);
                     break;
@@ -202,7 +206,7 @@ namespace Capstone
             DateTime startDate = CLIHelper.GetDateTime("Enter start date:");
             DateTime endDate = CLIHelper.GetDateTime("Enter end date:");
 
-            campgroundDAL.CampgroundAvailability(campgrounds[campground].Name, startDate, endDate);
+            campgroundDAL.GetCampgroundAvailability(campgrounds[campground].Name, startDate, endDate);
 
         }
 
