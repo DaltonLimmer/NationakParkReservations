@@ -198,10 +198,10 @@ namespace Capstone
             DateTime endDate = CLIHelper.GetDateTime("Enter end date:");
 
             var availableSites = campgroundDAL.GetCampgroundAvailability(campgrounds[campground].Name, startDate, endDate);
-            foreach (KeyValuePair<int, Site> site in availableSites)
+            foreach (var site in availableSites)
             {
                 double cost = campgrounds[campground].Daily_Fee;
-                Console.WriteLine($"{site.Value.SiteID} {site.Value.MaxOccupancy} {site.Value.MaxRVLength} {site.Value.UtilityHookups} {cost:c}");
+                Console.WriteLine($"{site.SiteID} {site.MaxOccupancy} {site.MaxRVLength} {site.UtilityHookups} {cost:c}");
             }
 
         }
