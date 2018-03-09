@@ -16,7 +16,7 @@ namespace Capstone.DAL
         private const string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Campground;Integrated Security = True";
         private const string SQL_GetParks = "select * from park order by name asc";
         private const string SQL_GetParkInfo = "select name, location, establish_date, area, visitors, description from park";
-        private const string SQL_GetCamgroundByPark = "SELECT * FROM campground JOIN park ON park.park_id = campground.park_id WHERE  park.name = @parkName;";
+        private const string SQL_GetCamgroundsByPark = "SELECT * FROM campground JOIN park ON park.park_id = campground.park_id WHERE  park.name = @parkName;";
 
         public Park GetParkInfo(string parkName)
         {
