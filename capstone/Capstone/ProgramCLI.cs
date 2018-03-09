@@ -42,7 +42,7 @@ namespace Capstone
             {11, "November" },
             {12, "December" }
         };
-        
+
 
 
 
@@ -216,7 +216,7 @@ namespace Capstone
 
         }
 
-        
+
 
         //Booking
         private void BookReservation()
