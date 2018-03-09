@@ -18,12 +18,15 @@ namespace Capstone.DAL
         private const string SQL_GetParkInfo = "select name, location, establish_date, area, visitors, description from park";
         private const string SQL_GetCamgroundsByPark = "SELECT * FROM campground JOIN park ON park.park_id = campground.park_id" +
         " WHERE  park.name = @parkName;";
-        private const string SQL_GetCamgroundsByName = "SELECT * FROM campground WHERE campground.name = @campgroundName";
+        private const string SQL_GetCampgroundsByName = "SELECT * FROM campground WHERE campground.name = @campgroundName";
         private const string SQL_GetReservationsByCampground = "select * from reservation JOIN site " +
         "ON site.site_id = reservation.site_id JOIN campground ON site.campground_id = campground.campground_id " +
         "WHERE campground.name = @campground";
-        private const string SQL_GetSitesbyCampground = "select site.site_id from site join campground " +
-        "ON campground.campground_id = site.campground_id where campground.name = @campground";
+        private const string SQL_GetCampgroundAvailability = "SELECT site.*, campground.name " +
+        "FROM site join campground on campground.campground_id = site.campground_id " +
+        "WHERE campground.name = @campgroundName AND site.site_id " +
+        "IN (SELECT site_id FROM reservation WHERE ((@startDate between reservation.from_date and reservation.to_date) " +
+        "OR (@endDate between reservation.from_date and reservation.to_date))) order by site.site_id";
 
         public Park GetParkInfo(string parkName)
         {
@@ -127,53 +130,27 @@ namespace Capstone.DAL
 
         //As a user of the system, I need the ability to select a campground and
         //search for date availability so that I can make a reservation.
-        public Dictionary<int, Site> GetCampgroundAvailability(string campgroundName, DateTime startDate, DateTime endDate)
+        public List<Site> GetCampgroundAvailability(string campgroundName, DateTime startDate, DateTime endDate)
         {
-            Dictionary<int, Reservation> reservations = new Dictionary<int, Reservation>();
-            Dictionary<int, Site> availableSites = new Dictionary<int, Site>();
+            List<Site> sites = new List<Site>();
 
-            //GetReservationsForCampground
             try
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(SQL_GetReservationsByCampground, conn);
-                    cmd.Parameters.AddWithValue("@campground", campgroundName);
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        Reservation item = GetReservationsFromReader(reader);
-                        reservations.Add(item.SiteID, item);
-                    }
-
-                }
-            }
-            catch (SqlException)
-            {
-
-                throw;
-            }
-
-            //GetSitesForCampground
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-
-                    SqlCommand cmd = new SqlCommand(SQL_GetSitesbyCampground, conn);
-                    cmd.Parameters.AddWithValue("@campground", campgroundName);
+                    SqlCommand cmd = new SqlCommand(SQL_GetCampgroundAvailability, conn);
+                    cmd.Parameters.AddWithValue("@campgroundName", campgroundName);
+                    cmd.Parameters.AddWithValue("@startDate", startDate);
+                    cmd.Parameters.AddWithValue("@endDate", endDate);
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     while (reader.Read())
                     {
                         Site item = GetSitesFromReader(reader);
-                        availableSites.Add(item.SiteID, item);
+                        sites.Add(item);
                     }
 
                 }
@@ -184,16 +161,9 @@ namespace Capstone.DAL
                 throw;
             }
 
-            foreach (KeyValuePair<int,Reservation> reservation in reservations)
-            {
-                if ((startDate < reservation.Value.ToDate) && (reservation.Value.FromDate < endDate))
-                {
-                    availableSites.Remove(reservation.Value.SiteID);
-                }
-            }
-            return availableSites;
-        }
+            return sites;
 
+        }
     
 
         public bool BookReservation(string personName, DateTime startDate, DateTime endDate)
