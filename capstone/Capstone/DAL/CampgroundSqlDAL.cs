@@ -50,7 +50,7 @@ namespace Capstone.DAL
 
         private const string SQL_AdvancedSearchWithRV = "select * from site where max_occupancy >= @numOfGuests" +
             " and max_rv_length >= @rvlength and accessible = @wheelchairAccessible and utilities = @utilitiesHookup";
-        const string getLastIdSQL = "SELECT CAST(SCOPE_IDENTITY() as int);";
+        private const string getLastIdSQL = "SELECT CAST(SCOPE_IDENTITY() as int);";
 
         #endregion 
 
