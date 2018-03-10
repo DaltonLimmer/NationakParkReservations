@@ -27,6 +27,12 @@ namespace Capstone.DAL
         "WHERE campground.name = @campgroundName AND site.site_id " +
         "IN (SELECT site_id FROM reservation WHERE ((@startDate between reservation.from_date and reservation.to_date) " +
         "OR (@endDate between reservation.from_date and reservation.to_date))) order by site.site_id";
+        private const string SQL_SearchParkForAvailability = "SELECT top 5 site.* FROM site join campground " +
+        "ON campground.campground_id = site.campground_id join park on campground.park_id = park.park_id " +
+        "WHERE park.name = @campgroundName and site.site_id not IN (SELECT site.site_number " +
+        "FROM reservation WHERE ((@startDate between reservation.from_date and reservation.to_date) " +
+        "OR (@endDate between reservation.from_date and reservation.to_date)))";
+        private const string SQL_InsertReservation = "insert into reservation VALUES (@siteID, @name, @startDate, @endDate)";
 
         public Park GetParkInfo(string parkName)
         {
@@ -164,26 +170,71 @@ namespace Capstone.DAL
             return sites;
 
         }
-    
 
-        public bool BookReservation(string personName, DateTime startDate, DateTime endDate)
+
+        public int BookReservation(string personName, int siteNumber, DateTime startDate, DateTime endDate)
         {
-            return true;
+            int lastId = 0;
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand(SQL_InsertReservation, conn);
+                    cmd.Parameters.AddWithValue("@siteID", siteNumber);
+                    cmd.Parameters.AddWithValue("@name", personName);
+                    cmd.Parameters.AddWithValue("@startDate", startDate);
+                    cmd.Parameters.AddWithValue("@endDate", endDate);
+                    lastId = (int)cmd.ExecuteScalar();
+
+                }
+
+            return lastId;
         }
 
         //As a user of the system, I want the ability to select a park and search for campsite
         //availability across the entire park so that I can make a reservation.
-        public bool SearchParkForAvailability(string parkName, DateTime startDate, DateTime endDate)
+        public List<Site> SearchParkForAvailability(string parkName, DateTime startDate, DateTime endDate)
         {
-            return true;
+            List<Site> sites = new List<Site>();
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand(SQL_GetCampgroundAvailability, conn);
+                    cmd.Parameters.AddWithValue("@parkName", parkName);
+                    cmd.Parameters.AddWithValue("@startDate", startDate);
+                    cmd.Parameters.AddWithValue("@endDate", endDate);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        Site item = GetSitesFromReader(reader);
+                        sites.Add(item);
+                    }
+
+                }
+            }
+            catch (SqlException)
+            {
+
+                throw;
+            }
+
+            return sites;
         }
 
-        //////BONUS: As a user of the system, I would like the ability to see a list
-        //////of all upcoming reservations within the next 30 days for a selected national park.
-        //public bool SearchParkForMadeReservations(string parkName)
-        //{
+        ////BONUS: As a user of the system, I would like the ability to see a list
+        ////of all upcoming reservations within the next 30 days for a selected national park.
+        public bool SearchParkForMadeReservations(string parkName)
+        {
 
-        //}
+
+        }
 
         ////Provide an advanced search functionality allowing users to indicate any
         ////requirements they have for maximum occupancy, requires wheelchair 
