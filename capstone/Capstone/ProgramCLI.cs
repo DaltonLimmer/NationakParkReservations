@@ -218,8 +218,25 @@ namespace Capstone
                 }
 
                 string reservationName = CLIHelper.GetString("What name should the reservation be made under?");
-                
-                
+
+                int? reservationId = null; 
+                    reservationId = campgroundDAL.BookReservation(reservationName, siteToReserve, startDate, endDate);
+
+                if (reservationId.HasValue)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine($"The reservation has been made and the confirmation id is {reservationId}");
+                }
+                else
+                {
+                    Console.WriteLine("Booking failed. Reservation failed.");
+                    Console.ReadKey();
+                }
+
+            }
+            else
+            {
+                Console.WriteLine("Booked");
             }
             
 
@@ -234,15 +251,16 @@ namespace Capstone
 
         private void GetParkCampsiteAdvancedSearch()
         {
-
+            CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
         }
 
 
 
         //Booking
-        private void BookReservation()
+        private void BookReservation(string personName, int siteNumber, DateTime startDate, DateTime endDate)
         {
-
+            //CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
+            //campgroundDAL.BookReservation(personName)
         }
 
         private void SearchParkForMadeReservations()

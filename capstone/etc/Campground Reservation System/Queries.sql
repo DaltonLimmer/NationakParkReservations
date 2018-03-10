@@ -18,4 +18,6 @@
 --ORDER BY reservation.from_date, reservation.to_date
 
 
+--insert into reservation(site_id, name, from_date, to_date) VALUES (@siteID, @name, @startDate, @endDate)
 
+SELECT * FROM reservation WHERE reservation_id = 45

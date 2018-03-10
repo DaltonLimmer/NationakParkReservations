@@ -12,6 +12,7 @@ namespace Capstone.DAL
 
     public class CampgroundSqlDAL
     {
+        #region Data Access Languages
         //string connectionString = ConfigurationManager.ConnectionStrings["Campground"].ConnectionString;
         private const string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Campground;Integrated Security = True";
         private const string SQL_GetParks = "select * from park order by name asc";
@@ -19,29 +20,39 @@ namespace Capstone.DAL
         private const string SQL_GetCamgroundsByPark = "SELECT * FROM campground JOIN park ON park.park_id = campground.park_id" +
         " WHERE  park.name = @parkName;";
         private const string SQL_GetCampgroundsByName = "SELECT * FROM campground WHERE campground.name = @campgroundName";
+
         private const string SQL_GetReservationsByCampground = "select * from reservation JOIN site " +
         "ON site.site_id = reservation.site_id JOIN campground ON site.campground_id = campground.campground_id " +
         "WHERE campground.name = @campground";
+
         private const string SQL_GetCampgroundAvailability = "SELECT site.*, campground.name " +
         "FROM site join campground on campground.campground_id = site.campground_id " +
         "WHERE campground.name = @campgroundName AND site.site_id " +
         "IN (SELECT site_id FROM reservation WHERE ((@startDate between reservation.from_date and reservation.to_date) " +
         "OR (@endDate between reservation.from_date and reservation.to_date))) order by site.site_id";
+
         private const string SQL_SearchParkForAvailability = "SELECT top 5 site.* FROM site join campground " +
         "ON campground.campground_id = site.campground_id join park on campground.park_id = park.park_id " +
         "WHERE park.name = @campgroundName and site.site_id IN (SELECT site.site_number " +
         "FROM reservation WHERE ((@startDate between reservation.from_date and reservation.to_date) " +
         "OR (@endDate between reservation.from_date and reservation.to_date)))";
-        private const string SQL_InsertReservation = "insert into reservation VALUES (@siteID, @name, @startDate, @endDate)";
+
+        private const string SQL_InsertReservation = "insert into reservation(site_id, name, from_date, to_date) VALUES (@siteID, @name, @startDate, @endDate)";
+
         private const string SQL_GetOpeningsForNext30Days = "SELECT site.* FROM site join campground " +
         "ON campground.campground_id = site.campground_id join park on campground.park_id = park.park_id " +
         "WHERE park.name = @campgroundName and site.site_id IN (SELECT site.site_number " +
         "FROM reservation WHERE ((@startDate between reservation.from_date and reservation.to_date) " +
         "OR (@endDate between reservation.from_date and reservation.to_date)))";
+
         private const string SQL_AdvancedSearchWithoutRV = "select * from site where max_occupancy >= @numOfGuests " +
         "and accessible = @wheelchairAccessible and utilities = @utilitiesHookup";
+
         private const string SQL_AdvancedSearchWithRV = "select * from site where max_occupancy >= @numOfGuests" +
             " and max_rv_length >= @rvlength and accessible = @wheelchairAccessible and utilities = @utilitiesHookup";
+        const string getLastIdSQL = "SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        #endregion 
 
         public Park GetParkInfo(string parkName)
         {
@@ -184,12 +195,14 @@ namespace Capstone.DAL
         public int BookReservation(string personName, int siteNumber, DateTime startDate, DateTime endDate)
         {
             int lastId = 0;
-
+            try
+            {
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(SQL_InsertReservation, conn);
+                    SqlCommand cmd;
+                    cmd = new SqlCommand(SQL_InsertReservation + getLastIdSQL, conn);
                     cmd.Parameters.AddWithValue("@siteID", siteNumber);
                     cmd.Parameters.AddWithValue("@name", personName);
                     cmd.Parameters.AddWithValue("@startDate", startDate);
@@ -197,7 +210,12 @@ namespace Capstone.DAL
                     lastId = (int)cmd.ExecuteScalar();
 
                 }
+            }
+            catch (SqlException)
+            {
 
+                throw;
+            }
             return lastId;
         }
 
@@ -350,6 +368,8 @@ namespace Capstone.DAL
 
         }
 
+
+        #region From Reader() methods
         private Park GetParksFromReader(SqlDataReader reader)
         {
             Park item = new Park
@@ -419,5 +439,7 @@ namespace Capstone.DAL
             return item;
 
         }
+
+        #endregion
     }
 }
