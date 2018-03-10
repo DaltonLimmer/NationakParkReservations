@@ -198,11 +198,30 @@ namespace Capstone
             DateTime endDate = CLIHelper.GetDateTime("Enter end date:");
 
             var availableSites = campgroundDAL.GetCampgroundAvailability(campgrounds[campground].Name, startDate, endDate);
-            foreach (var site in availableSites)
+
+            if (availableSites.Count > 0)
             {
-                double cost = campgrounds[campground].Daily_Fee;
-                Console.WriteLine($"{site.SiteID} {site.MaxOccupancy} {site.MaxRVLength} {site.UtilityHookups} {cost:c}");
+                List<int> availableSiteIds = new List<int>();
+
+                foreach (var site in availableSites)
+                {
+                    double cost = campgrounds[campground].Daily_Fee;
+                    availableSiteIds.Add(site.SiteID);
+                    Console.WriteLine($"{site.SiteID} {site.MaxOccupancy} {site.MaxRVLength} {site.UtilityHookups} {cost:c}");
+                }
+
+                int siteToReserve = CLIHelper.GetInteger("Which site should be reserved(enter 0 to cancel) ?");
+
+                while ( !(availableSiteIds.Contains(siteToReserve)) )
+                {
+                    siteToReserve = CLIHelper.GetInteger("Invalid site choice. Which site should be reserved(enter 0 to cancel) ?");
+                }
+
+                string reservationName = CLIHelper.GetString("What name should the reservation be made under?");
+                
+                
             }
+            
 
         }
 
