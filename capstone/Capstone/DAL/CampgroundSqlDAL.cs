@@ -29,10 +29,19 @@ namespace Capstone.DAL
         "OR (@endDate between reservation.from_date and reservation.to_date))) order by site.site_id";
         private const string SQL_SearchParkForAvailability = "SELECT top 5 site.* FROM site join campground " +
         "ON campground.campground_id = site.campground_id join park on campground.park_id = park.park_id " +
-        "WHERE park.name = @campgroundName and site.site_id not IN (SELECT site.site_number " +
+        "WHERE park.name = @campgroundName and site.site_id IN (SELECT site.site_number " +
         "FROM reservation WHERE ((@startDate between reservation.from_date and reservation.to_date) " +
         "OR (@endDate between reservation.from_date and reservation.to_date)))";
         private const string SQL_InsertReservation = "insert into reservation VALUES (@siteID, @name, @startDate, @endDate)";
+        private const string SQL_GetOpeningsForNext30Days = "SELECT site.* FROM site join campground " +
+        "ON campground.campground_id = site.campground_id join park on campground.park_id = park.park_id " +
+        "WHERE park.name = @campgroundName and site.site_id IN (SELECT site.site_number " +
+        "FROM reservation WHERE ((@startDate between reservation.from_date and reservation.to_date) " +
+        "OR (@endDate between reservation.from_date and reservation.to_date)))";
+        private const string SQL_AdvancedSearchWithoutRV = "select * from site where max_occupancy >= @numOfGuests " +
+        "and accessible = @wheelchairAccessible and utilities = @utilitiesHookup";
+        private const string SQL_AdvancedSearchWithRV = "select * from site where max_occupancy >= @numOfGuests" +
+            " and max_rv_length >= @rvlength and accessible = @wheelchairAccessible and utilities = @utilitiesHookup";
 
         public Park GetParkInfo(string parkName)
         {
@@ -204,7 +213,7 @@ namespace Capstone.DAL
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(SQL_GetCampgroundAvailability, conn);
+                    SqlCommand cmd = new SqlCommand(SQL_SearchParkForAvailability, conn);
                     cmd.Parameters.AddWithValue("@parkName", parkName);
                     cmd.Parameters.AddWithValue("@startDate", startDate);
                     cmd.Parameters.AddWithValue("@endDate", endDate);
@@ -230,19 +239,116 @@ namespace Capstone.DAL
 
         ////BONUS: As a user of the system, I would like the ability to see a list
         ////of all upcoming reservations within the next 30 days for a selected national park.
-        public bool SearchParkForMadeReservations(string parkName)
+        public List<Site> SearchParkForMadeReservations(string parkName)
         {
+            List<Site> sites = new List<Site>();
+            DateTime date = DateTime.Now;
 
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand(SQL_GetOpeningsForNext30Days, conn);
+                    cmd.Parameters.AddWithValue("@parkName", parkName);
+                    cmd.Parameters.AddWithValue("@startDate", date);
+                    cmd.Parameters.AddWithValue("@endDate", date.AddDays(30));
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        Site item = GetSitesFromReader(reader);
+                        sites.Add(item);
+                    }
+
+                }
+            }
+            catch (SqlException)
+            {
+
+                throw;
+            }
+
+            return sites;
 
         }
 
         ////Provide an advanced search functionality allowing users to indicate any
         ////requirements they have for maximum occupancy, requires wheelchair 
         ////accessible site, an rv and its length if required, and if a utility hookup is necessary.
-        //public List<Site> AdvancedSearch(int maxOccupancy, bool wheelchairAccessible, bool hasRV, int length, bool utilityHookupRequired)
-        //{
+        public List<Site> AdvancedSearchWithoutRV(int numberOfGuests, bool wheelchairAccessible, bool utilityHookupRequired)
+        {
+            List<Site> sites = new List<Site>();
 
-        //}
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand(SQL_AdvancedSearchWithoutRV, conn);
+                    cmd.Parameters.AddWithValue("@numOfGuests", numberOfGuests);
+                    cmd.Parameters.AddWithValue("@wheelchairAccessible", wheelchairAccessible);
+                    cmd.Parameters.AddWithValue("@utilitiesHookup", utilityHookupRequired);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        Site item = GetSitesFromReader(reader);
+                        sites.Add(item);
+                    }
+
+                }
+            }
+            catch (SqlException)
+            {
+
+                throw;
+            }
+
+            return sites;
+
+        }
+
+        public List<Site> AdvancedSearchWithRV(int numberOfGuests, bool wheelchairAccessible, int rvlength, bool utilityHookupRequired)
+        {
+            List<Site> sites = new List<Site>();
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand(SQL_AdvancedSearchWithRV, conn);
+                    cmd.Parameters.AddWithValue("@numOfGuests", numberOfGuests);
+                    cmd.Parameters.AddWithValue("@wheelchairAccessible", wheelchairAccessible);
+                    cmd.Parameters.AddWithValue("@rvlength", rvlength);
+                    cmd.Parameters.AddWithValue("@utilitiesHookup", utilityHookupRequired);
+                    
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        Site item = GetSitesFromReader(reader);
+                        sites.Add(item);
+                    }
+
+                }
+            }
+            catch (SqlException)
+            {
+
+                throw;
+            }
+
+            return sites;
+
+        }
 
         private Park GetParksFromReader(SqlDataReader reader)
         {
