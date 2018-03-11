@@ -107,6 +107,7 @@ namespace Capstone
         private void PrintParkInfoMenu()
         {
             Console.WriteLine("Select a Command");
+            Console.WriteLine(String.Format("").PadRight(30, '-'));
             Console.WriteLine(" 1) View Campgrounds");
             Console.WriteLine(" 2) Search for Reservations");
             Console.WriteLine(" 3) Return to Previous Screen");
@@ -117,6 +118,7 @@ namespace Capstone
         private void PrintCampgroundMenu()
         {
             Console.WriteLine("Select a Park for further Details");
+            Console.WriteLine(String.Format("").PadRight(30, '-'));
             Console.WriteLine("1) Search for Available Reservation");
             Console.WriteLine("2) Advance Search for Available Reservation");
             Console.WriteLine("3) Return to Previous Screen");
@@ -171,16 +173,14 @@ namespace Capstone
         private bool GetCampgrounds(string parkName)
         {
             bool returnToPrevious = false;
-            CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
-            Dictionary<int, Campground> campgrounds = campgroundDAL.GetAllCampgroundsInPark(parkName);
 
             Console.Clear();
             Console.WriteLine();
-            foreach (KeyValuePair<int, Campground> campground in campgrounds)
-            {
-                Console.WriteLine($"#{campground.Key} {campground.Value.Name} {Months[campground.Value.Open_From_MM]} {Months[campground.Value.Open_To_MM]} {campground.Value.Daily_Fee}");
-            }
+            Console.WriteLine($"{parkName} National Park Campgrounds");
+            
+            Dictionary<int, Campground> campgrounds = GetAndPrintCampgrounds(parkName);
 
+            
             Console.WriteLine();
             PrintCampgroundMenu();
 
@@ -190,6 +190,9 @@ namespace Capstone
             switch (command)
             {
                 case command_SearchForAvailableReservations:
+                    Console.Clear();
+                    
+                    GetAndPrintCampgrounds(parkName);
                     Console.WriteLine();
                     GetCampgroundAvailability(campgrounds);
                     break;
@@ -212,7 +215,7 @@ namespace Capstone
         {
 
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
-            int campground = campground = CLIHelper.GetInteger("Which Campground (enter 0 to cancel):");
+            int campground = CLIHelper.GetInteger("Which Campground (enter 0 to cancel):");
             bool returnToPrevious = campground == int.Parse(command_Cancel);
             //Return to previous screen if user enters 0
             if (returnToPrevious)
@@ -272,8 +275,11 @@ namespace Capstone
 
             while (!campgrounds.ContainsKey(campground))
             {
-                campground = campground = CLIHelper.GetInteger("Invalid choice. Please pick a campground number from available list:");
+                campground  = CLIHelper.GetInteger("Invalid choice. Please pick a campground number from available list:");
             };
+
+            DateTime startDate = CLIHelper.GetDateTime("Enter start date:");
+            DateTime endDate = CLIHelper.GetDateTime("Enter end date:");
 
             int numberOfGuests = CLIHelper.GetInteger("How many guests?");
 
@@ -284,26 +290,28 @@ namespace Capstone
             bool utilityHookup = CLIHelper.GetBoolFromYesOrNo("Utility hookups?");
 
             bool stillBooking = false;
+
             do
             {
-                DateTime startDate = CLIHelper.GetDateTime("Enter start date:");
-                DateTime endDate = CLIHelper.GetDateTime("Enter end date:");
-
-                var availableSites = campgroundDAL.GetCampgroundAvailabilityAdvancedSearch(campgrounds[campground].Name, startDate, endDate, 
+                
+                List<Site> availableSites = campgroundDAL.GetCampgroundAvailabilityAdvancedSearch(campgrounds[campground].Name, startDate, endDate, 
                     numberOfGuests, wheelChairAccessible, rvLength, utilityHookup);
 
                 if (availableSites.Count > 0)
                 {
+                    Console.WriteLine("Results Matching Your Search Criteria");
+                    Console.WriteLine("{0,13}{1,12}{2,13}{3,14}{4,9}{5,10}{6,7}", "Campground", "Site No.", "Max Occup.", "Accessible?", "RV Len", "Utility", "Cost");
                     List<int> availableSiteNumbers = new List<int>();
 
                     int totalReservDays = (int)(endDate - startDate).TotalDays;
 
                     foreach (var site in availableSites)
                     {
-                        double cost = campgrounds[campground].Daily_Fee * totalReservDays;
                         availableSiteNumbers.Add(site.SiteNumber);
+                        double cost = totalReservDays * campgrounds[campground].Daily_Fee;
 
-                        Console.WriteLine($"{site.SiteID} {site.MaxOccupancy} {site.MaxRVLength} {site.UtilityHookups} {cost:c}");
+                        Console.WriteLine(campgrounds[campground].Name.PadRight(13) + site.SiteNumber.ToString().PadRight(12) + site.MaxOccupancy.ToString().PadRight(13) +
+                            site.WheelchairAccess.PadRight(19) + site.MaxRVLength.PadRight(9) + site.UtilityHookups.PadRight(10) + cost);
                     }
 
                     BookReservation(availableSiteNumbers, startDate, endDate);
@@ -390,6 +398,22 @@ namespace Capstone
                 Console.ReadKey();
             }
 
+        }
+
+        private Dictionary<int, Campground> GetAndPrintCampgrounds(string parkName)
+        {
+            CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
+            Dictionary<int, Campground> campgrounds = campgroundDAL.GetAllCampgroundsInPark(parkName);
+
+            Console.WriteLine();
+            Console.WriteLine("{0, -6}{1,-17}{2,-12}{3,-12}{4,-14}", "", "Name", "Open", "Close", "Daily Fee");
+            Console.WriteLine(String.Format("").PadRight(60, '='));
+            foreach (KeyValuePair<int, Campground> campground in campgrounds)
+            {
+                Console.WriteLine(campground.Key.ToString().PadRight(6) + campground.Value.Name.PadRight(17) + Months[campground.Value.Open_From_MM].PadRight(12) + 
+                    Months[campground.Value.Open_To_MM].PadRight(12) + String.Format("{0:c}", campground.Value.Daily_Fee).PadRight(14));
+            }
+            return campgrounds;
         }
 
 
