@@ -141,5 +141,34 @@ namespace Capstone
 
             return userInput;
         }
+
+        public static bool GetBoolFromYesOrNo(string message)
+        {
+            string userInput = String.Empty;
+            int numberOfAttempts = 0;
+            bool isYesOrNo = userInput.ToLower() == "y" || userInput.ToLower() == "n" || userInput.ToLower() == "yes" || userInput.ToLower() == "no";
+            bool YestrueOrNoFalse = false;
+
+            do
+            {
+                if (numberOfAttempts > 0)
+                {
+                    Console.WriteLine("Invalid input. Please try again");
+                }
+
+                Console.Write(message + " ");
+                userInput = Console.ReadLine();
+
+                numberOfAttempts++;
+            }
+            while (String.IsNullOrEmpty(userInput) != isYesOrNo);
+
+            if (userInput.ToLower() == "y" || userInput.ToLower() == "yes")
+            {
+                YestrueOrNoFalse = true;
+            }
+
+            return YestrueOrNoFalse;
+        }
     }
 }

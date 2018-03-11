@@ -18,7 +18,7 @@ namespace Capstone
         private const string command_Quit = "q";
         private const string command_ViewCampgrounds = "1";
         private const string command_SearchReservations = "2";
-        private const int command_ReturnToPreviousScreen = 0;
+        private const string command_ReturnToPreviousScreen = "0";
         private const string command_SearchForAvailableReservations = "1";
         private const string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Campground;Integrated Security = True";
         private Dictionary<int, string> Parks = new Dictionary<int, string>()
@@ -55,9 +55,10 @@ namespace Capstone
                 
                 ConsoleKeyInfo userInput = Console.ReadKey();
                 string command = userInput.KeyChar.ToString();
-                bool validUserParkChoice = campgroundDAL.GetAllParksAlphabetically().ContainsKey(int.Parse(command));
+                Dictionary<int, Park> parks = campgroundDAL.GetAllParksAlphabetically();
+                bool isValidUserParkChoice = parks.ContainsKey(int.Parse(command));
 
-                if (validUserParkChoice)
+                if (isValidUserParkChoice)
                 {
                     bool isTurningoff = false;
 
@@ -201,41 +202,47 @@ namespace Capstone
             int campground = campground = CLIHelper.GetInteger("Which Campground (enter 0 to cancel):");
 
             //Return to previous screen if user enters 0
-            if (campground == command_ReturnToPreviousScreen)
+            if (campground == int.Parse(command_ReturnToPreviousScreen))
             {
                 return;
             }
 
             while (!campgrounds.ContainsKey(campground))
             {
-                campground = campground = CLIHelper.GetInteger("Invalid choice. Which Campground:");
+                campground = campground = CLIHelper.GetInteger("Invalid choice. Please pick a campground Site number from available list:");
             };
 
-            DateTime startDate = CLIHelper.GetDateTime("Enter start date:");
-            DateTime endDate = CLIHelper.GetDateTime("Enter end date:");
-
-            var availableSites = campgroundDAL.GetCampgroundAvailability(campgrounds[campground].Name, startDate, endDate);
-
-            if (availableSites.Count > 0)
+            bool stillBooking = false;
+            do
             {
-                List<int> availableSiteNumbers = new List<int>();
+                DateTime startDate = CLIHelper.GetDateTime("Enter start date:");
+                DateTime endDate = CLIHelper.GetDateTime("Enter end date:");
 
-                int totalReservDays = (int)(endDate - startDate).TotalDays;
+                var availableSites = campgroundDAL.GetCampgroundAvailability(campgrounds[campground].Name, startDate, endDate);
 
-                foreach (var site in availableSites)
+                if (availableSites.Count > 0)
                 {
-                    double cost = campgrounds[campground].Daily_Fee * totalReservDays;
-                    availableSiteNumbers.Add(site.SiteNumber);
+                    List<int> availableSiteNumbers = new List<int>();
 
-                    Console.WriteLine($"{site.SiteID} {site.MaxOccupancy} {site.MaxRVLength} {site.UtilityHookups} {cost:c}");
+                    int totalReservDays = (int)(endDate - startDate).TotalDays;
+
+                    foreach (var site in availableSites)
+                    {
+                        double cost = campgrounds[campground].Daily_Fee * totalReservDays;
+                        availableSiteNumbers.Add(site.SiteNumber);
+
+                        Console.WriteLine($"{site.SiteID} {site.MaxOccupancy} {site.MaxRVLength} {site.UtilityHookups} {cost:c}");
+                    }
+
+                    BookReservation(availableSiteNumbers, startDate, endDate);
                 }
-
-                BookReservation(availableSiteNumbers, startDate, endDate);
-            }
-            else
-            {
-                Console.WriteLine("Sorry there are no sites available at this time.");
-            }
+                else
+                {
+                    Console.WriteLine("Sorry there are no sites available in the specified date range.");
+                    stillBooking = CLIHelper.GetBoolFromYesOrNo("Would you like to enter another date range?");
+                }
+            } while (stillBooking);
+            
 
             
         }
@@ -286,7 +293,7 @@ namespace Capstone
             int siteToReserve = CLIHelper.GetInteger("Which site should be reserved(enter 0 to cancel) ?");
 
             //Return to previous screen if user enters 0
-            if (siteToReserve == command_ReturnToPreviousScreen)
+            if (siteToReserve == int.Parse(command_ReturnToPreviousScreen))
             {
                 return;
             }
