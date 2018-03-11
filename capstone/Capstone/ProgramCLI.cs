@@ -45,18 +45,26 @@ namespace Capstone
 
         public void RunCLI()
         {
-
-            while (true)
+            int numAttempt = 0;
+            do
             {
                 Console.Clear();
                 MainMenu();
 
                 CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
+
                 
+
+                if (numAttempt > 0)
+                {
+                    Console.WriteLine("The command provided was not a valid, please try again.");
+                }
+
                 ConsoleKeyInfo userInput = Console.ReadKey();
                 string command = userInput.KeyChar.ToString();
                 Dictionary<int, Park> parks = campgroundDAL.GetAllParksAlphabetically();
-                bool isValidUserParkChoice = parks.ContainsKey(int.Parse(command));
+                int.TryParse(command, out int parkKey);
+                bool isValidUserParkChoice = parks.ContainsKey(parkKey);
 
                 if (isValidUserParkChoice)
                 {
@@ -68,17 +76,12 @@ namespace Capstone
                         isTurningoff = GetParkInfo(park);
                     }
                 }
-                else if (command.ToLower() == "q")
+                else if (command.ToLower() == command_Quit)
                 {
                     return;
                 }
-                else
-                {
-                    Console.WriteLine("The command provided was not a valid command, please try again.");
-                }
-
-                
-            }
+                numAttempt++;
+            } while (true);
         }
 
         //Menus

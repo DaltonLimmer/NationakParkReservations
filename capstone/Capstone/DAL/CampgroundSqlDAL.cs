@@ -19,7 +19,7 @@ namespace Capstone.DAL
         private const string SQL_GetParkInfo = "select * from park where park.name = @parkName";
         private const string SQL_GetCamgroundsByPark = "SELECT * FROM campground JOIN park ON park.park_id = campground.park_id" +
         " WHERE  park.name = @parkName;";
-        private const string SQL_GetCampgroundsByName = "SELECT * FROM campground WHERE campground.name = @campgroundName";
+        
 
         private const string SQL_GetReservationsByCampground = "select * from reservation JOIN site " +
         "ON site.site_id = reservation.site_id JOIN campground ON site.campground_id = campground.campground_id " +
@@ -84,6 +84,37 @@ namespace Capstone.DAL
             return park;
         }
 
+        public Campground GetCampgroundInfo(string campgroundName)
+        {
+            const string SQL_GetCampgroundByName = "SELECT * FROM campground WHERE campground.name = @campgroundName";
+            Campground campground = new Campground();
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand(SQL_GetCampgroundByName, conn);
+                    cmd.Parameters.AddWithValue("@campgroundName", campgroundName);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        campground = GetCampgroundFromReader(reader);
+                    }
+
+                }
+            }
+            catch (SqlException)
+            {
+
+                throw;
+            }
+
+            return campground;
+        }
 
         public Dictionary<int, Park> GetAllParksAlphabetically()
         {
@@ -161,6 +192,7 @@ namespace Capstone.DAL
         public List<Site> GetCampgroundAvailability(string campgroundName, DateTime startDate, DateTime endDate)
         {
             List<Site> sites = new List<Site>();
+            
 
             try
             {
@@ -187,6 +219,15 @@ namespace Capstone.DAL
             {
 
                 throw;
+            }
+
+            Campground campground = GetCampgroundInfo(campgroundName);
+
+            bool inSeason = Between(startDate.Month, endDate.Month, campground.Open_From_MM, campground.Open_To_MM);
+
+            if (!inSeason)
+            {
+                sites.Clear();
             }
 
             return sites;
@@ -252,6 +293,11 @@ namespace Capstone.DAL
             {
 
                 throw;
+            }
+
+            if (true)
+            {
+
             }
 
             return sites;
@@ -371,6 +417,7 @@ namespace Capstone.DAL
         }
 
 
+
         #region From Reader() methods
         private Park GetParkFromReader(SqlDataReader reader)
         {
@@ -392,6 +439,10 @@ namespace Capstone.DAL
 
         private Campground GetCampgroundFromReader(SqlDataReader reader)
         {
+            if (true)
+            {
+
+            }
             Campground item = new Campground
             {
                 CampgroundId = Convert.ToInt32(reader["campground_id"]),
@@ -441,6 +492,15 @@ namespace Capstone.DAL
             return item;
 
         }
+
+        private static bool Between(int reservStartMonth, int reservEndMonth, int parkOpenFromMonth, int parkOpenToMonth)
+        {
+            bool inclusive = (parkOpenFromMonth <= reservStartMonth && reservStartMonth <= parkOpenToMonth) &&
+                (parkOpenFromMonth <= reservEndMonth && reservEndMonth <= parkOpenToMonth);
+
+            return inclusive;
+        }
+
 
         #endregion
     }

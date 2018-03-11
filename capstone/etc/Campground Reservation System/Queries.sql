@@ -41,4 +41,4 @@
 --WHERE campground.name = 'Blackwoods' and (('2018/03/03' between reservation.from_date and reservation.to_date) or 
 --('2018/03/15' between reservation.from_date and reservation.to_date))
 
-SELECT * from reservation
+SELECT * from campground
