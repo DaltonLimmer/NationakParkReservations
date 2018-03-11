@@ -93,7 +93,7 @@ namespace Capstone
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
             Dictionary<int, Park> parks = campgroundDAL.GetAllParksAlphabetically();
 
-            Console.WriteLine("Select a Park for further Details");
+            Console.WriteLine("Select a Park for further details");
             foreach (KeyValuePair<int, Park> park in parks)
             {
                 Console.WriteLine($"{park.Key}) {park.Value.Name}");
@@ -118,7 +118,7 @@ namespace Capstone
         {
             Console.WriteLine("Select a Park for further Details");
             Console.WriteLine("1) Search for Available Reservation");
-            Console.WriteLine("2) Advance Search for Available Reservation");
+            Console.WriteLine("2) Advanced Search for Available Reservation");
             Console.WriteLine("3) Return to Previous Screen");
             Console.WriteLine();
 

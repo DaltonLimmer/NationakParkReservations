@@ -14,7 +14,7 @@ namespace Capstone.DAL
     {
         #region Data Access Languages
         //string connectionString = ConfigurationManager.ConnectionStrings["Campground"].ConnectionString;
-        private const string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Campground;Integrated Security = True";
+        private string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Campground;Integrated Security = True";
         private const string SQL_GetParksAlphabetically = "select * from park order by name asc";
         private const string SQL_GetParkInfo = "select * from park where park.name = @parkName";
         private const string SQL_GetCamgroundsByPark = "SELECT * FROM campground JOIN park ON park.park_id = campground.park_id" +
@@ -52,6 +52,7 @@ namespace Capstone.DAL
             "site.accessible = @wheelchairAccessible and site.utilities = @utilitiesHookup) order by site.site_id";
 
         private const string getLastIdSQL = "SELECT CAST(SCOPE_IDENTITY() as int);";
+
 
         #endregion 
 
