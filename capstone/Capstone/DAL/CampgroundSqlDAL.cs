@@ -15,8 +15,8 @@ namespace Capstone.DAL
         #region Data Access Languages
         //string connectionString = ConfigurationManager.ConnectionStrings["Campground"].ConnectionString;
         private const string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Campground;Integrated Security = True";
-        private const string SQL_GetParks = "select * from park order by name asc";
-        private const string SQL_GetParkInfo = "select name, location, establish_date, area, visitors, description from park";
+        private const string SQL_GetParksAlphabetically = "select * from park order by name asc";
+        private const string SQL_GetParkInfo = "select * from park where park.name = @parkName";
         private const string SQL_GetCamgroundsByPark = "SELECT * FROM campground JOIN park ON park.park_id = campground.park_id" +
         " WHERE  park.name = @parkName;";
         private const string SQL_GetCampgroundsByName = "SELECT * FROM campground WHERE campground.name = @campgroundName";
@@ -25,17 +25,16 @@ namespace Capstone.DAL
         "ON site.site_id = reservation.site_id JOIN campground ON site.campground_id = campground.campground_id " +
         "WHERE campground.name = @campground";
 
-        private const string SQL_GetCampgroundAvailability = "SELECT site.*, campground.name " +
-        "FROM site join campground on campground.campground_id = site.campground_id " +
-        "WHERE campground.name = @campgroundName AND site.site_id " +
-        "IN (SELECT site_id FROM reservation WHERE ((@startDate between reservation.from_date and reservation.to_date) " +
-        "OR (@endDate between reservation.from_date and reservation.to_date))) order by site.site_id";
+        private const string SQL_GetCampgroundAvailability = "SELECT * FROM site join campground on campground.campground_id = site.campground_id " +
+            "WHERE campground.name = @campgroundName AND site.site_id NOT IN (SELECT site.site_id FROM reservation Join site ON site.site_id = reservation.site_id " +
+            "JOIN campground ON campground.campground_id = site.campground_id WHERE campground.name = @campgroundName and (@startDate between reservation.from_date and reservation.to_date) " +
+            "or (@endDate between reservation.from_date and reservation.to_date) or(reservation.from_date between @startDate and @endDate) or " +
+            "(reservation.to_date between @startDate and @endDate)  ) order by site.site_id";
 
-        private const string SQL_SearchParkForAvailability = "SELECT top 5 site.* FROM site join campground " +
-        "ON campground.campground_id = site.campground_id join park on campground.park_id = park.park_id " +
-        "WHERE park.name = @campgroundName and site.site_id IN (SELECT site.site_number " +
-        "FROM reservation WHERE ((@startDate between reservation.from_date and reservation.to_date) " +
-        "OR (@endDate between reservation.from_date and reservation.to_date)))";
+        private const string SQL_GetParkAvailability = "SELECT TOP 5 site.* FROM site JOIN campground ON campground.campground_id = site.campground_id " +
+            "JOIN park ON park.park_id = campground.park_id WHERE park.name = @parkName AND site.site_id NOT IN (SELECT site.site_id FROM reservation " +
+            "join site ON reservation.site_id = site.site_id join campground ON campground.campground_id = site.campground_id join park on campground.park_id = park.park_id " +
+            "WHERE park.name = @parkName AND  ((@startDate between reservation.from_date and reservation.to_date) OR (@endDate between reservation.from_date and reservation.to_date)))";
 
         private const string SQL_InsertReservation = "insert into reservation(site_id, name, from_date, to_date) VALUES (@siteID, @name, @startDate, @endDate)";
 
@@ -64,13 +63,14 @@ namespace Capstone.DAL
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(SQL_GetParks, conn);
+                    SqlCommand cmd = new SqlCommand(SQL_GetParkInfo, conn);
+                    cmd.Parameters.AddWithValue("@parkName", parkName);
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     while (reader.Read())
                     {
-                        park = GetParksFromReader(reader);
+                        park = GetParkFromReader(reader);
                     }
 
                 }
@@ -85,9 +85,9 @@ namespace Capstone.DAL
         }
 
 
-        public List<Park> GetAllParksAlphabetically()
+        public Dictionary<int, Park> GetAllParksAlphabetically()
         {
-            List<Park> parks = new List<Park>();
+            Dictionary<int,Park> parks = new Dictionary<int, Park>();
 
             try
             {
@@ -95,14 +95,16 @@ namespace Capstone.DAL
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(SQL_GetParks, conn);
+                    SqlCommand cmd = new SqlCommand(SQL_GetParksAlphabetically, conn);
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
+                    int key = 1;
                     while (reader.Read())
                     {
-                        Park item = GetParksFromReader(reader);
-                        parks.Add(item);
+                        Park item = GetParkFromReader(reader);
+                        parks.Add(key, item);
+                        key++;
                     }
 
                 }
@@ -221,7 +223,7 @@ namespace Capstone.DAL
 
         //As a user of the system, I want the ability to select a park and search for campsite
         //availability across the entire park so that I can make a reservation.
-        public List<Site> SearchParkForAvailability(string parkName, DateTime startDate, DateTime endDate)
+        public List<Site> GetParkAvailability(string parkName, DateTime startDate, DateTime endDate)
         {
             List<Site> sites = new List<Site>();
 
@@ -231,7 +233,7 @@ namespace Capstone.DAL
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(SQL_SearchParkForAvailability, conn);
+                    SqlCommand cmd = new SqlCommand(SQL_GetParkAvailability, conn);
                     cmd.Parameters.AddWithValue("@parkName", parkName);
                     cmd.Parameters.AddWithValue("@startDate", startDate);
                     cmd.Parameters.AddWithValue("@endDate", endDate);
@@ -370,7 +372,7 @@ namespace Capstone.DAL
 
 
         #region From Reader() methods
-        private Park GetParksFromReader(SqlDataReader reader)
+        private Park GetParkFromReader(SqlDataReader reader)
         {
             Park item = new Park
             {
@@ -430,9 +432,9 @@ namespace Capstone.DAL
                 CampgroundID = Convert.ToInt32(reader["campground_id"]),
                 SiteNumber = Convert.ToInt32(reader["site_number"]),
                 MaxOccupancy = Convert.ToInt32(reader["max_occupancy"]),
-                WheelchairAccess = Convert.ToBoolean(reader["accessible"]),
-                MaxRVLength = Convert.ToInt32(reader["max_rv_length"]),
-                UtilityHookups = Convert.ToBoolean(reader["utilities"]),
+                WheelchairAccess = Convert.ToString(reader["accessible"]),
+                MaxRVLength = Convert.ToString(reader["max_rv_length"]),
+                UtilityHookups = Convert.ToString(reader["utilities"]),
 
             };
 

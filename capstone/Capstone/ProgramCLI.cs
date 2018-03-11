@@ -80,13 +80,16 @@ namespace Capstone
         //Menus
         private void PrintMainMenu()
         {
-            Console.WriteLine("Select a Park for further Details");
-            Console.WriteLine(" 1) Acadia");
-            Console.WriteLine(" 2) Arches");
-            Console.WriteLine(" 3) Cuyahoga National Valley Park");
-            Console.WriteLine();
+            CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
+            Dictionary<int, Park> parks = campgroundDAL.GetAllParksAlphabetically();
 
-            Console.WriteLine(" Q) Quit");
+            Console.WriteLine("Select a Park for further Details");
+            foreach (KeyValuePair<int, Park> park in parks)
+            {
+                Console.WriteLine($"{park.Key}) {park.Value.Name}");
+            }
+
+            Console.WriteLine("Q) Quit");
             Console.WriteLine();
 
         }
@@ -110,8 +113,6 @@ namespace Capstone
 
         }
 
-
-        //Get Park Info
         private void GetParkInfo(int parkDictionaryKey)
         {
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
@@ -138,7 +139,7 @@ namespace Capstone
                     GetCampgrounds(Parks[parkDictionaryKey]);
                     break;
                 case command_SearchReservations:
-                    //GetCampgroundAvailability();
+                    GetParkWideAvailability(park.Name);
                     break;
                 case command_ReturnToPreviousScreen:
 
@@ -175,7 +176,6 @@ namespace Capstone
             {
                 case command_SearchForAvailableReservations:
                     //Search Availabilities
-                    //GetCampgrounds(parkName);
                     Console.WriteLine("Enter campground 1-3");
                     Console.WriteLine();
                     GetCampgroundAvailability(campgrounds);
@@ -193,7 +193,12 @@ namespace Capstone
         private void GetCampgroundAvailability(Dictionary<int, Campground> campgrounds)
         {
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
-            int campground = CLIHelper.GetInteger("Which Campground:");
+            int campground = campground = CLIHelper.GetInteger("Which Campground:");
+            while (!campgrounds.ContainsKey(campground))
+            {
+                campground = campground = CLIHelper.GetInteger("Invalid choice. Which Campground:");
+            };
+
             DateTime startDate = CLIHelper.GetDateTime("Enter start date:");
             DateTime endDate = CLIHelper.GetDateTime("Enter end date:");
 
@@ -236,31 +241,73 @@ namespace Capstone
             }
             else
             {
-                Console.WriteLine("Booked");
+                Console.WriteLine("Sorry there are no sites available at this time.");
             }
             
 
         }
 
+        private void GetParkWideAvailability(string parkName)
+        {
+            CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
+            Dictionary<int,Campground> campgrounds = campgroundDAL.GetAllCampgroundsInPark(parkName);
 
-        ////Availabilities
-        //private void GetAvailableCampgroundReservations()
-        //{
+            Console.Clear();
+            DateTime startDate = CLIHelper.GetDateTime("What is the arrival date?:");
+            DateTime endDate = CLIHelper.GetDateTime("What is the departure date?:");
 
-        //}
+            List<Site> availableSites = campgroundDAL.GetParkAvailability(parkName, startDate, endDate ); //////// CHANGE DATES!!!! new DateTime(2018, 03, 05), new DateTime(2018, 03, 10)
+
+            if (availableSites.Count > 0)
+            {
+                Console.WriteLine("Results Matching Your Search Criteria");
+                Console.WriteLine("{0,13}{1,12}{2,13}{3,14}{4,9}{5,10}{6,7}", "Campground", "Site No.", "Max Occup.", "Accessible?", "RV Len", "Utility", "Cost");
+                List<int> availableSiteIds = new List<int>();
+
+                foreach (var site in availableSites)
+                {
+                    Campground campground = campgrounds.Where(i => i.Value.CampgroundId == site.CampgroundID).First().Value;
+                    availableSiteIds.Add(site.SiteID);
+
+                    Console.WriteLine(campground.Name.PadRight(13) + site.SiteID.ToString().PadRight(12) + site.MaxOccupancy.ToString().PadRight(13) +
+                        site.WheelchairAccess.PadRight(19) + site.MaxRVLength.PadRight(9) + site.UtilityHookups.PadRight(10) + campground.Daily_Fee);
+                }
+
+                int siteToReserve = CLIHelper.GetInteger("Which site should be reserved(enter 0 to cancel) ?");
+
+                while (!(availableSiteIds.Contains(siteToReserve)))
+                {
+                    siteToReserve = CLIHelper.GetInteger("Invalid site choice. Which site should be reserved(enter 0 to cancel) ?");
+                }
+
+                string reservationName = CLIHelper.GetString("What name should the reservation be made under?");
+
+                int? reservationId = null;
+                reservationId = campgroundDAL.BookReservation(reservationName, siteToReserve, startDate, endDate);
+
+                if (reservationId.HasValue)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine($"The reservation has been made and the confirmation id is {reservationId}");
+                }
+                else
+                {
+                    Console.WriteLine("Booking failed. Reservation failed.");
+                    Console.ReadKey();
+                }
+            }
+            else
+            {
+                Console.WriteLine("Sorry there are no sites available at this time.");
+            }
+
+            
+
+        }
 
         private void GetParkCampsiteAdvancedSearch()
         {
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
-        }
-
-
-
-        //Booking
-        private void BookReservation(string personName, int siteNumber, DateTime startDate, DateTime endDate)
-        {
-            //CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
-            //campgroundDAL.BookReservation(personName)
         }
 
         private void SearchParkForMadeReservations()
