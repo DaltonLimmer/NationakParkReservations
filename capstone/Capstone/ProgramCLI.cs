@@ -18,7 +18,9 @@ namespace Capstone
         private const string command_Quit = "q";
         private const string command_ViewCampgrounds = "1";
         private const string command_SearchReservations = "2";
-        private const string command_ReturnToPreviousScreen = "0";
+        private const string command_AdvanceSearchReservations = "2";
+
+        private const string command_ReturnToPreviousScreen = "3";
         private const string command_SearchForAvailableReservations = "1";
         private const string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Campground;Integrated Security = True";
         private Dictionary<int, string> Parks = new Dictionary<int, string>()
@@ -84,7 +86,8 @@ namespace Capstone
             } while (true);
         }
 
-        //Menus
+        #region Menus
+
         private void MainMenu()
         {
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
@@ -114,55 +117,60 @@ namespace Capstone
         private void PrintCampgroundMenu()
         {
             Console.WriteLine("Select a Park for further Details");
-            Console.WriteLine(" 1) Search for Available Reservation");
-            Console.WriteLine(" 2) Return to Previous Screen");
+            Console.WriteLine("1) Search for Available Reservation");
+            Console.WriteLine("2) Advance Search for Available Reservation");
+            Console.WriteLine("3) Return to Previous Screen");
             Console.WriteLine();
 
         }
+        
+        #endregion end of menus
 
         private bool GetParkInfo(int parkDictionaryKey)
         {
-            bool isReturning = false;
+            bool returnToPrevious = false;
+             
 
-            CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
+                CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
 
-            Park park = campgroundDAL.GetParkInfo(Parks[parkDictionaryKey]);
+                Park park = campgroundDAL.GetParkInfo(Parks[parkDictionaryKey]);
 
-            Console.Clear();
-            Console.WriteLine($"{park.Name}");
-            Console.WriteLine($"Location: {park.Location}");
-            Console.WriteLine($"Established: {park.Establish_Date.ToShortDateString()}");
-            Console.WriteLine($"Area: {park.Area} sq km");
-            Console.WriteLine($"Annual Visitors: {park.Visitors}");
+                Console.Clear();
+                Console.WriteLine($"{park.Name}");
+                Console.WriteLine($"Location: {park.Location}");
+                Console.WriteLine($"Established: {park.Establish_Date.ToShortDateString()}");
+                Console.WriteLine($"Area: {park.Area} sq km");
+                Console.WriteLine($"Annual Visitors: {park.Visitors}");
 
-            Console.WriteLine();
+                Console.WriteLine();
 
-            PrintParkInfoMenu();
-            ConsoleKeyInfo userInput = Console.ReadKey();
-            string command = userInput.KeyChar.ToString();
+                PrintParkInfoMenu();
+                ConsoleKeyInfo userInput = Console.ReadKey();
+                string command = userInput.KeyChar.ToString();
 
 
-            switch (command)
-            {
-                case command_ViewCampgrounds:
-                    GetCampgrounds(Parks[parkDictionaryKey]);
-                    break;
-                case command_SearchReservations:
-                    GetParkWideAvailability(park.Name);
-                    break;
-                case command_ReturnToPreviousScreen:
-                    isReturning = true;
-                    break;
-                default:
-                    Console.WriteLine("The command provided was not a valid command, please try again.");
-                    command = Console.ReadKey().ToString();
-                    break;
-            }
-            return isReturning;
+                switch (command)
+                {
+                    case command_ViewCampgrounds:
+                        GetCampgrounds(Parks[parkDictionaryKey]);
+                        break;
+                    case command_SearchReservations:
+                        GetParkWideAvailability(park.Name);
+                        break;
+                    case command_ReturnToPreviousScreen:
+                        returnToPrevious = true;
+                        break;
+                    default:
+                        Console.WriteLine("The command provided was not a valid, please try again.");
+                        command = Console.ReadKey().ToString();
+                        break;
+                }
+            return returnToPrevious;
         }
 
-        private void GetCampgrounds(string parkName)
+        private bool GetCampgrounds(string parkName)
         {
+            bool returnToPrevious = false;
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
             Dictionary<int, Campground> campgrounds = campgroundDAL.GetAllCampgroundsInPark(parkName);
 
@@ -182,19 +190,21 @@ namespace Capstone
             switch (command)
             {
                 case command_SearchForAvailableReservations:
-                    //Search Availabilities
-                    Console.WriteLine("Enter campground 1-3");
                     Console.WriteLine();
                     GetCampgroundAvailability(campgrounds);
                     break;
+                case command_AdvanceSearchReservations:
+                    GetCampgroundAvailabilityAdvanced(campgrounds);
+                    break;
                 case command_ReturnToPreviousScreen:
-
+                    returnToPrevious = true;
                     break;
                 default:
                     Console.WriteLine("The command provided was not a valid command, please try again.");
                     command = Console.ReadKey().ToString();
                     break;
             }
+            return returnToPrevious;
         }
 
 
@@ -203,9 +213,9 @@ namespace Capstone
 
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
             int campground = campground = CLIHelper.GetInteger("Which Campground (enter 0 to cancel):");
-
+            bool returnToPrevious = campground == int.Parse(command_Cancel);
             //Return to previous screen if user enters 0
-            if (campground == int.Parse(command_ReturnToPreviousScreen))
+            if (returnToPrevious)
             {
                 return;
             }
@@ -248,6 +258,63 @@ namespace Capstone
             
 
             
+        }
+        private void GetCampgroundAvailabilityAdvanced(Dictionary<int, Campground> campgrounds)
+        {
+            CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
+            int campground = campground = CLIHelper.GetInteger("Which Campground (enter 0 to cancel):");
+            bool returnToPrevious = campground == int.Parse(command_Cancel);
+            //Return to previous screen if user enters 0
+            if (returnToPrevious)
+            {
+                return;
+            }
+
+            while (!campgrounds.ContainsKey(campground))
+            {
+                campground = campground = CLIHelper.GetInteger("Invalid choice. Please pick a campground number from available list:");
+            };
+
+            int numberOfGuests = CLIHelper.GetInteger("How many guests?");
+
+            bool wheelChairAccessible = CLIHelper.GetBoolFromYesOrNo("Wheel chair accessible?");
+
+            int rvLength = CLIHelper.GetInteger("RV length");
+
+            bool utilityHookup = CLIHelper.GetBoolFromYesOrNo("Utility hookups?");
+
+            bool stillBooking = false;
+            do
+            {
+                DateTime startDate = CLIHelper.GetDateTime("Enter start date:");
+                DateTime endDate = CLIHelper.GetDateTime("Enter end date:");
+
+                var availableSites = campgroundDAL.GetCampgroundAvailabilityAdvancedSearch(campgrounds[campground].Name, startDate, endDate, 
+                    numberOfGuests, wheelChairAccessible, rvLength, utilityHookup);
+
+                if (availableSites.Count > 0)
+                {
+                    List<int> availableSiteNumbers = new List<int>();
+
+                    int totalReservDays = (int)(endDate - startDate).TotalDays;
+
+                    foreach (var site in availableSites)
+                    {
+                        double cost = campgrounds[campground].Daily_Fee * totalReservDays;
+                        availableSiteNumbers.Add(site.SiteNumber);
+
+                        Console.WriteLine($"{site.SiteID} {site.MaxOccupancy} {site.MaxRVLength} {site.UtilityHookups} {cost:c}");
+                    }
+
+                    BookReservation(availableSiteNumbers, startDate, endDate);
+                }
+                else
+                {
+                    Console.WriteLine("Sorry there are no sites available in the specified date range.");
+                    stillBooking = CLIHelper.GetBoolFromYesOrNo("Would you like to enter another date range?");
+                }
+            } while (stillBooking);
+
         }
 
         private void GetParkWideAvailability(string parkName)
@@ -296,7 +363,7 @@ namespace Capstone
             int siteToReserve = CLIHelper.GetInteger("Which site should be reserved(enter 0 to cancel) ?");
 
             //Return to previous screen if user enters 0
-            if (siteToReserve == int.Parse(command_ReturnToPreviousScreen))
+            if (siteToReserve == int.Parse(command_Cancel))
             {
                 return;
             }
@@ -326,12 +393,7 @@ namespace Capstone
         }
 
 
-        private void GetParkCampsiteAdvancedSearch()
-        {
-            CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
-        }
-
-        private void SearchParkForMadeReservations()
+        private void GetAllReservationsFor30DaysByPark()
         {
 
         }

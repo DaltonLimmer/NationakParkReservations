@@ -379,7 +379,7 @@ namespace Capstone.DAL
 
         }
 
-        public List<Site> AdvancedSearchWithRV(int numberOfGuests, bool wheelchairAccessible, int rvlength, bool utilityHookupRequired)
+        public List<Site> GetCampgroundAvailabilityAdvancedSearch(string parkName, DateTime startDate, DateTime endDate, int numberOfGuests, bool wheelchairAccessible, int rvlength, bool utilityHookupRequired)
         {
             List<Site> sites = new List<Site>();
 
