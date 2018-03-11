@@ -8,9 +8,9 @@ namespace Capstone.Models
 {
     public class Site
     {
-        private string _wheelChairAccess = "0";
-        private string _maxRVLength = "0";
-        private string _utility = "0";
+        private string _wheelChairAccess;
+        private string _maxRVLength;
+        private string _utility;
         public int SiteID { get; set; }
         public int CampgroundID { get; set; }
         public int SiteNumber { get; set; }
@@ -19,12 +19,15 @@ namespace Capstone.Models
         {
             get
             {
-                string yesOrNo = "No";
-                if (_wheelChairAccess == "1")
+                if (_wheelChairAccess == "true")
                 {
-                    return "Yes";
+                    _wheelChairAccess = "Yes";
                 }
-                return yesOrNo;
+                else
+                {
+                    _wheelChairAccess = "N/A";
+                }
+                return _wheelChairAccess;
             }
             set
             {
@@ -35,32 +38,37 @@ namespace Capstone.Models
         {
             get
             {
-                string lengthString = "N/A";
-
-                if (int.Parse(_maxRVLength) > 0)
+                if (_maxRVLength == "true")
                 {
-                    lengthString = _maxRVLength;
+                    _maxRVLength = "Yes";
+                }
+                else
+                {
+                    _maxRVLength = "N/A";
                 }
 
-                return lengthString;
+                return _maxRVLength;
             }
             set
             {
-                _wheelChairAccess = value;
+                _maxRVLength = value;
             } 
         }
         public string UtilityHookups
         {
             get
             {
-                string availability = "N/A";
 
-                if (_utility == "1")
+                if (_utility == "true")
                 {
-                    availability = "Yes";
+                    _utility = "Yes";
+                }
+                else
+                {
+                    _utility = "N/A";
                 }
 
-                return availability;
+                return _utility;
             }
             set
             {

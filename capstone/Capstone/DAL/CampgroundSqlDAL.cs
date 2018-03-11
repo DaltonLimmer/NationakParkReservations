@@ -25,7 +25,7 @@ namespace Capstone.DAL
         "ON site.site_id = reservation.site_id JOIN campground ON site.campground_id = campground.campground_id " +
         "WHERE campground.name = @campground";
 
-        private const string SQL_GetCampgroundAvailability = "SELECT * FROM site join campground on campground.campground_id = site.campground_id " +
+        private const string SQL_GetCampgroundAvailability = "SELECT TOP 5 * FROM site join campground on campground.campground_id = site.campground_id " +
             "WHERE campground.name = @campgroundName AND site.site_id NOT IN (SELECT site.site_id FROM reservation Join site ON site.site_id = reservation.site_id " +
             "JOIN campground ON campground.campground_id = site.campground_id WHERE campground.name = @campgroundName and (@startDate between reservation.from_date and reservation.to_date) " +
             "or (@endDate between reservation.from_date and reservation.to_date) or(reservation.from_date between @startDate and @endDate) or " +
@@ -44,11 +44,13 @@ namespace Capstone.DAL
         "FROM reservation WHERE ((@startDate between reservation.from_date and reservation.to_date) " +
         "OR (@endDate between reservation.from_date and reservation.to_date)))";
 
-        private const string SQL_AdvancedSearchWithoutRV = "select * from site where max_occupancy >= @numOfGuests " +
-        "and accessible = @wheelchairAccessible and utilities = @utilitiesHookup";
+        private const string SQL_AdvancedSearch = "SELECT TOP 5 * FROM site join campground on campground.campground_id = site.campground_id " +
+            "WHERE campground.name = @campgroundName AND site.site_id NOT IN (SELECT site.site_id FROM reservation Join site ON site.site_id = reservation.site_id " +
+            "JOIN campground ON campground.campground_id = site.campground_id WHERE campground.name = @campgroundName and (@startDate between reservation.from_date and reservation.to_date) " +
+            "or (@endDate between reservation.from_date and reservation.to_date) or(reservation.from_date between @startDate and @endDate) or " +
+            "(reservation.to_date between @startDate and @endDate)  AND site.max_occupancy >= @numOfGuests and site.max_rv_length >= @rvlength and " +
+            "site.accessible = @wheelchairAccessible and site.utilities = @utilitiesHookup) order by site.site_id";
 
-        private const string SQL_AdvancedSearchWithRV = "select * from site where max_occupancy >= @numOfGuests" +
-            " and max_rv_length >= @rvlength and accessible = @wheelchairAccessible and utilities = @utilitiesHookup";
         private const string getLastIdSQL = "SELECT CAST(SCOPE_IDENTITY() as int);";
 
         #endregion 
@@ -344,7 +346,9 @@ namespace Capstone.DAL
         ////Provide an advanced search functionality allowing users to indicate any
         ////requirements they have for maximum occupancy, requires wheelchair 
         ////accessible site, an rv and its length if required, and if a utility hookup is necessary.
-        public List<Site> AdvancedSearchWithoutRV(int numberOfGuests, bool wheelchairAccessible, bool utilityHookupRequired)
+
+        public List<Site> GetCampgroundAvailabilityAdvancedSearch(string campgroundName, DateTime startDate, DateTime endDate, 
+            int numberOfGuests, bool wheelchairAccessible, int rvlength, bool utilityHookupRequired)
         {
             List<Site> sites = new List<Site>();
 
@@ -354,42 +358,10 @@ namespace Capstone.DAL
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(SQL_AdvancedSearchWithoutRV, conn);
-                    cmd.Parameters.AddWithValue("@numOfGuests", numberOfGuests);
-                    cmd.Parameters.AddWithValue("@wheelchairAccessible", wheelchairAccessible);
-                    cmd.Parameters.AddWithValue("@utilitiesHookup", utilityHookupRequired);
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        Site item = GetSitesFromReader(reader);
-                        sites.Add(item);
-                    }
-
-                }
-            }
-            catch (SqlException)
-            {
-
-                throw;
-            }
-
-            return sites;
-
-        }
-
-        public List<Site> GetCampgroundAvailabilityAdvancedSearch(string parkName, DateTime startDate, DateTime endDate, int numberOfGuests, bool wheelchairAccessible, int rvlength, bool utilityHookupRequired)
-        {
-            List<Site> sites = new List<Site>();
-
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-
-                    SqlCommand cmd = new SqlCommand(SQL_AdvancedSearchWithRV, conn);
+                    SqlCommand cmd = new SqlCommand(SQL_AdvancedSearch, conn);
+                    cmd.Parameters.AddWithValue("@campgroundName", campgroundName);
+                    cmd.Parameters.AddWithValue("@startDate", startDate);
+                    cmd.Parameters.AddWithValue("@endDate", endDate);
                     cmd.Parameters.AddWithValue("@numOfGuests", numberOfGuests);
                     cmd.Parameters.AddWithValue("@wheelchairAccessible", wheelchairAccessible);
                     cmd.Parameters.AddWithValue("@rvlength", rvlength);
@@ -415,8 +387,6 @@ namespace Capstone.DAL
             return sites;
 
         }
-
-
 
         #region From Reader() methods
         private Park GetParkFromReader(SqlDataReader reader)
