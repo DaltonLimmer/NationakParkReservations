@@ -53,6 +53,29 @@ namespace Capstone
 
         }
 
+        public static int GetIntegerChar(string message)
+        {
+            string userInput = String.Empty;
+            int intValue = 0;
+            int numberOfAttempts = 0;
+
+            do
+            {
+                if (numberOfAttempts > 0)
+                {
+                    Console.WriteLine("Invalid input format. Please try again");
+                }
+
+                Console.Write(message + " ");
+                userInput = Console.ReadKey().KeyChar.ToString();
+                numberOfAttempts++;
+            }
+            while (!int.TryParse(userInput, out intValue));
+
+            return intValue;
+
+        }
+
         public static double GetDouble(string message)
         {
             string userInput = String.Empty;
