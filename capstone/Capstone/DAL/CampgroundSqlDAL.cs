@@ -40,7 +40,7 @@ namespace Capstone.DAL
 
         private const string SQL_GetOpeningsForNext30Days = "SELECT site.* FROM site join campground " +
         "ON campground.campground_id = site.campground_id join park on campground.park_id = park.park_id " +
-        "WHERE park.name = @campgroundName and site.site_id IN (SELECT site.site_number " +
+        "WHERE park.name = @parkName and site.site_id IN (SELECT site.site_number " +
         "FROM reservation WHERE ((@startDate between reservation.from_date and reservation.to_date) " +
         "OR (@endDate between reservation.from_date and reservation.to_date)))";
 
@@ -399,7 +399,7 @@ namespace Capstone.DAL
                 Name = Convert.ToString(reader["name"]),
                 Location = Convert.ToString(reader["location"]),
                 Establish_Date = Convert.ToDateTime(reader["establish_date"]),
-                Area = Convert.ToString(reader["area"]),
+                Area = Convert.ToInt32(reader["area"]),
                 Visitors = Convert.ToInt32(reader["visitors"]),
                 Description = Convert.ToString(reader["description"]),
 
