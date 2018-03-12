@@ -56,6 +56,12 @@
     <Compile Include="CampgroundDALTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Capstone\Capstone.csproj">
+      <Project>{a715d926-a478-4098-a01c-d7d241f4fbf0}</Project>
+      <Name>Capstone</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

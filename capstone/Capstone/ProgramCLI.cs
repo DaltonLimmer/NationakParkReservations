@@ -97,8 +97,8 @@ namespace Capstone
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
             Dictionary<int, Park> parks = campgroundDAL.GetAllParksAlphabetically();
 
+            Console.WriteLine("Select a park for further details");
             Console.WriteLine();
-            Console.WriteLine("Select a Park for further Details");
             Console.WriteLine(String.Format("").PadRight(30, '='));
             foreach (KeyValuePair<int, Park> park in parks)
             {
@@ -123,10 +123,10 @@ namespace Capstone
 
         private void PrintCampgroundMenu()
         {
-            Console.WriteLine("Select a Park for further Details");
+            Console.WriteLine("Select a park for further Details");
             Console.WriteLine(String.Format("").PadRight(30, '-'));
             Console.WriteLine("1) Search for Available Reservation");
-            Console.WriteLine("2) Advance Search for Available Reservation");
+            Console.WriteLine("2) Advanced Search for Available Reservation");
             Console.WriteLine("3) Return to Previous Screen");
             Console.WriteLine();
 
@@ -239,8 +239,8 @@ namespace Capstone
             bool stillBooking = false;
             do
             {
-                DateTime startDate = CLIHelper.GetDateTime("Enter start date:");
-                DateTime endDate = CLIHelper.GetDateTime("Enter end date:");
+                DateTime startDate = CLIHelper.GetDateTime("Enter start date (YYYY/MM/DD):");
+                DateTime endDate = CLIHelper.GetDateTime("Enter end date (YYYY/MM/DD):");
 
                 var availableSites = campgroundDAL.GetCampgroundAvailability(campgrounds[campground].Name, startDate, endDate);
 
@@ -262,7 +262,7 @@ namespace Capstone
                 }
                 else
                 {
-                    Console.WriteLine("Sorry there are no sites available in the specified date range.");
+                    Console.WriteLine("Sorry, there are no sites available in the specified date range.");
                     stillBooking = CLIHelper.GetBoolFromYesOrNo("Would you like to enter another date range?");
                 }
             } while (stillBooking);
@@ -286,16 +286,16 @@ namespace Capstone
                 campground  = CLIHelper.GetInteger("Invalid choice. Please pick a campground number from available list:");
             };
 
-            DateTime startDate = CLIHelper.GetDateTime("Enter start date:");
-            DateTime endDate = CLIHelper.GetDateTime("Enter end date:");
+            DateTime startDate = CLIHelper.GetDateTime("Enter start date (YYYY/MM/DD):");
+            DateTime endDate = CLIHelper.GetDateTime("Enter end date (YYYY/MM/DD):");
 
             int numberOfGuests = CLIHelper.GetInteger("How many guests?");
 
-            bool wheelChairAccessible = CLIHelper.GetBoolFromYesOrNo("Wheel chair accessible?");
+            bool wheelChairAccessible = CLIHelper.GetBoolFromYesOrNo("Wheel chair accessible (y or n)?");
 
-            int rvLength = CLIHelper.GetInteger("RV length");
+            int rvLength = CLIHelper.GetInteger("RV length: ");
 
-            bool utilityHookup = CLIHelper.GetBoolFromYesOrNo("Utility hookups?");
+            bool utilityHookup = CLIHelper.GetBoolFromYesOrNo("Utility hookups (y or n)?");
 
             bool stillBooking = false;
 
@@ -326,7 +326,7 @@ namespace Capstone
                 }
                 else
                 {
-                    Console.WriteLine("Sorry there are no sites available in the specified date range.");
+                    Console.WriteLine("Sorry, there are no sites available in the specified date range.");
                     stillBooking = CLIHelper.GetBoolFromYesOrNo("Would you like to enter another date range?");
                 }
             } while (stillBooking);
@@ -339,8 +339,8 @@ namespace Capstone
             Dictionary<int,Campground> campgrounds = campgroundDAL.GetAllCampgroundsInPark(parkName);
 
             Console.Clear();
-            DateTime startDate = CLIHelper.GetDateTime("What is the arrival date?:");
-            DateTime endDate = CLIHelper.GetDateTime("What is the departure date?:");
+            DateTime startDate = CLIHelper.GetDateTime("What is the arrival date (YYYY/MM/DD)?:");
+            DateTime endDate = CLIHelper.GetDateTime("What is the departure date (YYYY/MM/DD)?:");
 
             List<Site> availableSites = campgroundDAL.GetParkAvailability(parkName, startDate, endDate ); //////// CHANGE DATES!!!! new DateTime(2018, 03, 05), new DateTime(2018, 03, 10)
 
@@ -368,7 +368,7 @@ namespace Capstone
             }
             else
             {
-                Console.WriteLine("Sorry there are no sites available at this time.");
+                Console.WriteLine("Sorry, there are no sites available at this time.");
             }
         }
 
