@@ -158,6 +158,8 @@ namespace Capstone
             ConsoleKeyInfo userInput = Console.ReadKey();
             string command = userInput.KeyChar.ToString();
 
+            const string command_PreviousScreen = "4";
+            const string command_Get30DaysOfReservations = "3";
 
             switch (command)
             {
@@ -167,7 +169,10 @@ namespace Capstone
                 case command_SearchReservations:
                     GetParkWideAvailability(park.Name);
                     break;
-                case command_ReturnToPreviousScreen:
+                case command_Get30DaysOfReservations:
+                    
+                    break;
+                case command_PreviousScreen:
                     returnToPrevious = true;
                     break;
                 default:
