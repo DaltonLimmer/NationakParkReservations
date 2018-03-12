@@ -3,18 +3,18 @@
 --SELECT * FROM SITE 
 SELECT * FROM reservation ORDER BY reservation.from_date
 
---SELECT reservation.* FROM reservation
---JOIN site ON site.site_id = reservation.site_id
---JOIN campground ON campground.campground_id = site.campground_id
---JOIN park ON park.park_id = campground.park_id
---WHERE park.name = 'acadia' 
---AND ( reservation.from_date BETWEEN GETDATE() AND DATEADD(day, 30, GetDATE()) )
---ORDER BY reservation.from_date
-
 SELECT reservation.* FROM reservation
 JOIN site ON site.site_id = reservation.site_id
 JOIN campground ON campground.campground_id = site.campground_id
 JOIN park ON park.park_id = campground.park_id
+WHERE park.name = @parkName
+AND ( reservation.from_date BETWEEN GETDATE() AND DATEADD(day, 30, GetDATE()) )
+ORDER BY reservation.from_date
+
+--SELECT reservation.* FROM reservation
+--JOIN site ON site.site_id = reservation.site_id
+--JOIN campground ON campground.campground_id = site.campground_id
+--JOIN park ON park.park_id = campground.park_id
 
 --SELECT TOP 5 * FROM site 
 --JOIN campground ON campground.campground_id = site.campground_id 

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Capstone
 {
@@ -116,7 +117,8 @@ namespace Capstone
             Console.WriteLine(String.Format("").PadRight(30, '-'));
             Console.WriteLine(" 1) View Campgrounds");
             Console.WriteLine(" 2) Search for Reservations");
-            Console.WriteLine(" 3) Return to Previous Screen");
+            Console.WriteLine(" 3) View Reservations For Next 30 days");
+            Console.WriteLine(" 4) Return to Previous Screen");
             Console.WriteLine();
 
         }
@@ -170,7 +172,7 @@ namespace Capstone
                     GetParkWideAvailability(park.Name);
                     break;
                 case command_Get30DaysOfReservations:
-                    
+                    GetAllReservationsFor30DaysByPark(park.Name);
                     break;
                 case command_PreviousScreen:
                     returnToPrevious = true;
@@ -199,6 +201,7 @@ namespace Capstone
 
             ConsoleKeyInfo userInput = Console.ReadKey();
             string command = userInput.KeyChar.ToString();
+            Console.Write("\b");
 
             switch (command)
             {
@@ -255,12 +258,17 @@ namespace Capstone
 
                     int totalReservDays = (int)(endDate - startDate).TotalDays;
 
+                    Console.Clear();
+                    Console.WriteLine("Results Matching Your Search Criteria");
+                    Console.WriteLine();
+                    Console.WriteLine("{0,3}{1,12}{2,13}{3,14}{4,9}{5,10}{6,7}", "Campground", "Site No.", "Max Occup.", "Accessible?", "RV Len", "Utility", "Cost");
                     foreach (var site in availableSites)
                     {
                         double cost = campgrounds[campground].Daily_Fee * totalReservDays;
                         availableSiteNumbers.Add(site.SiteNumber);
 
-                        Console.WriteLine($"{site.SiteID} {site.MaxOccupancy} {site.MaxRVLength} {site.UtilityHookups} {cost:c}");
+                        Console.WriteLine(campgrounds[campground].Name.PadRight(17) + site.SiteNumber.ToString().PadRight(12) + site.MaxOccupancy.ToString().PadRight(13) +
+                            site.WheelchairAccess.PadRight(11) + site.MaxRVLength.PadRight(10) + site.UtilityHookups.PadRight(9) + cost);
                     }
 
                     BookReservation(availableSiteNumbers, startDate, endDate);
@@ -312,6 +320,7 @@ namespace Capstone
 
                 if (availableSites.Count > 0)
                 {
+                    Console.Clear();
                     Console.WriteLine("Results Matching Your Search Criteria");
                     Console.WriteLine();
                     Console.WriteLine("{0,3}{1,12}{2,13}{3,14}{4,9}{5,10}{6,7}", "Campground", "Site No.", "Max Occup.", "Accessible?", "RV Len", "Utility", "Cost");
@@ -437,8 +446,31 @@ namespace Capstone
         }
 
 
-        private void GetAllReservationsFor30DaysByPark()
+        private void GetAllReservationsFor30DaysByPark(string parkName)
         {
+            CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
+            List<Reservation> reservations = campgroundDAL.GetAllReservationsForNext30Days(parkName);
+
+            bool returnToPrevious = false;
+            do
+            {
+                Console.Clear();
+                Console.WriteLine("{0,-18}{1,-10}{2, -30}{3,-13}{4,-13}", "Confirmation ID", "Site", "Name", "From-Date", "To-Date");
+                Console.WriteLine(String.Format("").PadRight(80, '='));
+
+                foreach (var reserv in reservations)
+                {
+                    Console.WriteLine(reserv.ReservationID.ToString().PadRight(18) + reserv.SiteID.ToString().PadRight(10) + 
+                        reserv.Name.PadRight(30) + reserv.FromDate.ToShortDateString().PadRight(13) + reserv.ToDate.ToShortDateString().PadRight(13));
+                }
+
+                Console.WriteLine();
+                Console.WriteLine("Press (Enter) Return to previous screen");
+                char userInput = Console.ReadKey().KeyChar;
+
+                returnToPrevious = userInput == (char)Keys.Return ? true : false;
+
+            } while (!returnToPrevious);
 
         }
 

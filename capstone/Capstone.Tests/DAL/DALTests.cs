@@ -152,22 +152,6 @@ namespace Capstone.Tests
         }
 
         [TestMethod]
-        public void SearchParkForReservationTest()
-        {
-
-            //Arrange
-            CampgroundSqlDAL campgroundSqlDAL = new CampgroundSqlDAL();
-            DateTime dt1 = new DateTime(2018, 3, 3, 0, 0, 0);
-            DateTime dt2 = new DateTime(2018, 3, 5, 0, 0, 0);
-
-            //Act
-            List<Site> sites = campgroundSqlDAL.SearchParkForMadeReservations("Acadia");
-
-            //Assert
-            Assert.AreEqual(12, sites.Count);
-        }
-
-        [TestMethod]
         public void AdvancedSearchTest()
         {
 

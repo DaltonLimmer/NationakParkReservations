@@ -44,6 +44,10 @@ namespace Capstone.DAL
         "FROM reservation WHERE ((@startDate between reservation.from_date and reservation.to_date) " +
         "OR (@endDate between reservation.from_date and reservation.to_date)))";
 
+        private const string SQL_GetAllReservationsForNext30Days = "SELECT reservation.* FROM reservation JOIN site ON site.site_id = reservation.site_id " +
+            "JOIN campground ON campground.campground_id = site.campground_id JOIN park ON park.park_id = campground.park_id WHERE park.name = @parkName " +
+            "AND (reservation.from_date BETWEEN GETDATE() AND DATEADD(day, 30, GetDATE()) ) ORDER BY reservation.from_date";
+
         private const string SQL_AdvancedSearch = "SELECT TOP 5 * FROM site join campground on campground.campground_id = site.campground_id WHERE campground.name = @campgroundName " +
             "AND site.max_occupancy >= @numOfGuests and site.max_rv_length >= @rvLength  and site.accessible = @wheelchairAccessible and site.utilities = @utilitiesHookup AND site.site_id " +
             "NOT IN (SELECT site.site_id FROM reservation Join site ON site.site_id = reservation.site_id JOIN campground ON campground.campground_id = site.campground_id " +
@@ -309,9 +313,9 @@ namespace Capstone.DAL
 
         ////BONUS: As a user of the system, I would like the ability to see a list
         ////of all upcoming reservations within the next 30 days for a selected national park.
-        public List<Site> SearchParkForMadeReservations(string parkName)
+        public List<Reservation> GetAllReservationsForNext30Days(string parkName)
         {
-            List<Site> sites = new List<Site>();
+            List<Reservation> reservations = new List<Reservation>();
             DateTime date = DateTime.Now;
 
             try
@@ -320,17 +324,15 @@ namespace Capstone.DAL
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(SQL_GetOpeningsForNext30Days, conn);
+                    SqlCommand cmd = new SqlCommand(SQL_GetAllReservationsForNext30Days, conn);
                     cmd.Parameters.AddWithValue("@parkName", parkName);
-                    cmd.Parameters.AddWithValue("@startDate", date);
-                    cmd.Parameters.AddWithValue("@endDate", date.AddDays(30));
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     while (reader.Read())
                     {
-                        Site item = GetSitesFromReader(reader);
-                        sites.Add(item);
+                        Reservation item = GetReservationsFromReader(reader);
+                        reservations.Add(item);
                     }
 
                 }
@@ -341,8 +343,7 @@ namespace Capstone.DAL
                 throw;
             }
 
-            return sites;
-
+            return reservations;
         }
 
         ////Provide an advanced search functionality allowing users to indicate any
@@ -389,6 +390,8 @@ namespace Capstone.DAL
             return sites;
 
         }
+
+        
 
         #region From Reader() methods
         private Park GetParkFromReader(SqlDataReader reader)
@@ -455,9 +458,10 @@ namespace Capstone.DAL
                 CampgroundID = Convert.ToInt32(reader["campground_id"]),
                 SiteNumber = Convert.ToInt32(reader["site_number"]),
                 MaxOccupancy = Convert.ToInt32(reader["max_occupancy"]),
-                WheelchairAccess = Convert.ToString(reader["accessible"]),
-                MaxRVLength = Convert.ToString(reader["max_rv_length"]),
-                UtilityHookups = Convert.ToString(reader["utilities"]),
+                WheelchairAccess = Convert.ToBoolean(reader["accessible"]) ? "Yes" : "No",
+                MaxRVLength = Convert.ToInt32(reader["max_rv_length"]) > 0 ? Convert.ToInt32(reader["max_rv_length"]).ToString() : "N/A",
+
+                UtilityHookups = Convert.ToBoolean(reader["utilities"]) ? "Yes" : "N/A",
 
             };
 
