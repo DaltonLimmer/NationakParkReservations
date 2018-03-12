@@ -133,9 +133,10 @@ namespace Capstone
             Console.WriteLine();
 
         }
-        
+
         #endregion end of menus
 
+        #region CrudCLIMethods()
         private bool GetParkInfo(int parkDictionaryKey)
         {
             bool returnToPrevious = false;
@@ -225,7 +226,6 @@ namespace Capstone
             }
             return returnToPrevious;
         }
-
 
         private void GetCampgroundAvailability(Dictionary<int, Campground> campgrounds)
         {
@@ -473,6 +473,6 @@ namespace Capstone
             } while (!returnToPrevious);
 
         }
-
+        #endregion
     }
 }
