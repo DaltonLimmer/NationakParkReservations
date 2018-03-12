@@ -313,7 +313,8 @@ namespace Capstone
                 if (availableSites.Count > 0)
                 {
                     Console.WriteLine("Results Matching Your Search Criteria");
-                    Console.WriteLine("{0,13}{1,12}{2,13}{3,14}{4,9}{5,10}{6,7}", "Campground", "Site No.", "Max Occup.", "Accessible?", "RV Len", "Utility", "Cost");
+                    Console.WriteLine();
+                    Console.WriteLine("{0,3}{1,12}{2,13}{3,14}{4,9}{5,10}{6,7}", "Campground", "Site No.", "Max Occup.", "Accessible?", "RV Len", "Utility", "Cost");
                     List<int> availableSiteNumbers = new List<int>();
 
                     int totalReservDays = (int)(endDate - startDate).TotalDays;
@@ -323,8 +324,8 @@ namespace Capstone
                         availableSiteNumbers.Add(site.SiteNumber);
                         double cost = totalReservDays * campgrounds[campground].Daily_Fee;
 
-                        Console.WriteLine(campgrounds[campground].Name.PadRight(13) + site.SiteNumber.ToString().PadRight(12) + site.MaxOccupancy.ToString().PadRight(13) +
-                            site.WheelchairAccess.PadRight(19) + site.MaxRVLength.PadRight(9) + site.UtilityHookups.PadRight(10) + cost);
+                        Console.WriteLine(campgrounds[campground].Name.PadRight(17) + site.SiteNumber.ToString().PadRight(12) + site.MaxOccupancy.ToString().PadRight(13) +
+                            site.WheelchairAccess.PadRight(11) + site.MaxRVLength.PadRight(10) + site.UtilityHookups.PadRight(9) + cost);
                     }
 
                     BookReservation(availableSiteNumbers, startDate, endDate);
