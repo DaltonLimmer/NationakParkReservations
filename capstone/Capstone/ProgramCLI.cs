@@ -413,6 +413,8 @@ namespace Capstone
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
             Dictionary<int, Campground> campgrounds = campgroundDAL.GetAllCampgroundsInPark(parkName);
 
+            //int campgroundNameLength
+
             Console.WriteLine();
             Console.WriteLine("{0, -6}{1,-17}{2,-12}{3,-12}{4,-14}", "", "Name", "Open", "Close", "Daily Fee");
             Console.WriteLine(String.Format("").PadRight(60, '='));

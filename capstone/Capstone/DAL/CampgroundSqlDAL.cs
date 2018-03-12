@@ -13,7 +13,6 @@ namespace Capstone.DAL
     public class CampgroundSqlDAL
     {
         #region Data Access Languages
-        //string connectionString = ConfigurationManager.ConnectionStrings["Campground"].ConnectionString;
         private const string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Campground;Integrated Security = True";
         private const string SQL_GetParksAlphabetically = "select * from park order by name asc";
         private const string SQL_GetParkInfo = "select * from park where park.name = @parkName";
