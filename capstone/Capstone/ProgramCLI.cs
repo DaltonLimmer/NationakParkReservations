@@ -100,7 +100,7 @@ namespace Capstone
 
             Console.WriteLine("Select a park for further details");
             Console.WriteLine();
-            Console.WriteLine(String.Format("").PadRight(30, '='));
+            Console.WriteLine(String.Format("").PadRight(35, '='));
             foreach (KeyValuePair<int, Park> park in parks)
             {
                 Console.WriteLine($"{park.Key}) {park.Value.Name}");
@@ -125,8 +125,8 @@ namespace Capstone
 
         private void PrintCampgroundMenu()
         {
-            Console.WriteLine("Select a park for further Details");
-            Console.WriteLine(String.Format("").PadRight(30, '-'));
+            Console.WriteLine("Select a campground for further Details");
+            Console.WriteLine(String.Format("").PadRight(50, '-'));
             Console.WriteLine("1) Search for Available Reservation");
             Console.WriteLine("2) Advanced Search for Available Reservation");
             Console.WriteLine("3) Return to Previous Screen");
@@ -467,12 +467,13 @@ namespace Capstone
             //int campgroundNameLength
 
             Console.WriteLine();
-            Console.WriteLine("{0, -6}{1,-17}{2,-12}{3,-12}{4,-14}", "", "Name", "Open", "Close", "Daily Fee");
-            Console.WriteLine(String.Format("").PadRight(60, '='));
+            Console.WriteLine("{0, -6}{1,-25}{2,-12}{3,-12}{4,-14}", "", "Name", "Open", "Close", "Daily Fee");
+            Console.WriteLine(String.Format("").PadRight(65, '='));
 
             foreach (KeyValuePair<int, Campground> campground in campgrounds)
             {
-                Console.WriteLine('#' + campground.Key.ToString().PadRight(6) + campground.Value.Name.PadRight(17) + Months[campground.Value.Open_From_MM].PadRight(12) + 
+
+                Console.WriteLine('#' + campground.Key.ToString().PadRight(5) + campground.Value.Name.PadRight(25) + Months[campground.Value.Open_From_MM].PadRight(12) + 
                     Months[campground.Value.Open_To_MM].PadRight(12) + String.Format("{0:c}", campground.Value.Daily_Fee).PadRight(14));
             }
             return campgrounds;
