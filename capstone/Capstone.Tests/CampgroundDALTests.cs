@@ -14,7 +14,7 @@ namespace Capstone.Tests
     public class CampgroundDALTests
     {
         private TransactionScope tran;
-        private string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=World;Integrated Security = True";
+        private string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Campground;Integrated Security = True";
 
 
         /*
@@ -42,13 +42,7 @@ namespace Capstone.Tests
                 //cmd = new SqlCommand("INSERT INTO City VALUES (5000, 'Test City', 'ABC', 'Test District', 1);", conn); // SELECT CAST(SCOPE_IDENTITY() as int);
                 //cityId = 5000;// (int)cmd.ExecuteScalar();
                 //cmd.ExecuteNonQuery();
-
-
-
             }
-
-
-
         }
         
 
@@ -68,7 +62,19 @@ namespace Capstone.Tests
         * TEST:
         * Using ABC Country, validate that there is only one official language.
         */
-        
+        [TestMethod()]
+        public void GetParkInfoTest()
+        {
+
+                //Arrange
+                CampgroundSqlDAL campgroundSqlDAL = new CampgroundSqlDAL();
+
+                //Act
+                Park park = campgroundSqlDAL.GetParkInfo("park");
+
+                //Assert
+                Assert.AreEqual(3333, park.Area);
+        }
 
     }
 }
