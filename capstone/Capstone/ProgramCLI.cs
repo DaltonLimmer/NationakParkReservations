@@ -342,10 +342,11 @@ namespace Capstone
             DateTime startDate = CLIHelper.GetDateTime("What is the arrival date (YYYY/MM/DD)?:");
             DateTime endDate = CLIHelper.GetDateTime("What is the departure date (YYYY/MM/DD)?:");
 
-            List<Site> availableSites = campgroundDAL.GetParkAvailability(parkName, startDate, endDate ); //////// CHANGE DATES!!!! new DateTime(2018, 03, 05), new DateTime(2018, 03, 10)
+            List<Site> availableSites = campgroundDAL.GetParkAvailability(parkName, startDate, endDate ); 
 
             if (availableSites.Count > 0)
             {
+                Console.Clear();
                 Console.WriteLine("Results Matching Your Search Criteria");
                 Console.WriteLine("{0,13}{1,12}{2,13}{3,14}{4,9}{5,10}{6,7}", "Campground", "Site No.", "Max Occup.", "Accessible?", "RV Len", "Utility", "Cost");
                 List<int> availableSiteNumbers = new List<int>();
@@ -368,7 +369,9 @@ namespace Capstone
             }
             else
             {
-                Console.WriteLine("Sorry, there are no sites available at this time.");
+                Console.WriteLine("Sorry, there are no sites available in the specified date range.");
+                bool stillBooking = CLIHelper.GetBoolFromYesOrNo("Would you like to enter another date range?");
+
             }
         }
 
