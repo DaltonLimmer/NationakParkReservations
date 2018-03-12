@@ -146,7 +146,7 @@ namespace Capstone
         {
             string userInput = String.Empty;
             int numberOfAttempts = 0;
-            bool isYesOrNo = userInput.ToLower() == "y" || userInput.ToLower() == "n" || userInput.ToLower() == "yes" || userInput.ToLower() == "no";
+            bool isYesOrNo;
             bool YestrueOrNoFalse = false;
 
             do
@@ -157,18 +157,23 @@ namespace Capstone
                 }
 
                 Console.Write(message + " ");
-                userInput = Console.ReadLine();
+                userInput = Console.ReadLine().ToLower();
 
                 numberOfAttempts++;
-            }
-            while (String.IsNullOrEmpty(userInput) != isYesOrNo);
 
-            if (userInput.ToLower() == "y" || userInput.ToLower() == "yes")
+                isYesOrNo = userInput == "y" || userInput == "n" ||
+                userInput == "yes" || userInput == "no";
+
+            }
+            while (String.IsNullOrEmpty(userInput) || !isYesOrNo);
+
+            if (userInput== "y" || userInput == "yes")
             {
                 YestrueOrNoFalse = true;
             }
-
             return YestrueOrNoFalse;
         }
+
+        
     }
 }

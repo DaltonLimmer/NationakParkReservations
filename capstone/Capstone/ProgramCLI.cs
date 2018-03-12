@@ -136,6 +136,8 @@ namespace Capstone
 
         #endregion end of menus
 
+       
+
         #region CrudCLIMethods()
         private bool GetParkInfo(int parkDictionaryKey)
         {
@@ -260,7 +262,7 @@ namespace Capstone
 
                     Console.Clear();
                     Console.WriteLine("Results Matching Your Search Criteria");
-                    Console.WriteLine();
+                    Console.WriteLine(String.Format("").PadRight(30, '='));
                     Console.WriteLine("{0,3}{1,12}{2,13}{3,14}{4,9}{5,10}{6,7}", "Campground", "Site No.", "Max Occup.", "Accessible?", "RV Len", "Utility", "Cost");
                     foreach (var site in availableSites)
                     {
@@ -271,7 +273,11 @@ namespace Capstone
                             site.WheelchairAccess.PadRight(11) + site.MaxRVLength.PadRight(10) + site.UtilityHookups.PadRight(9) + cost);
                     }
 
-                    BookReservation(availableSiteNumbers, startDate, endDate);
+                    bool reservationSuccessful = BookReservation(availableSiteNumbers, startDate, endDate);
+                    if (reservationSuccessful)
+                    {
+                        stillBooking = false;
+                    }
                 }
                 else
                 {
@@ -342,7 +348,14 @@ namespace Capstone
                 else
                 {
                     Console.WriteLine("Sorry, there are no sites available in the specified date range.");
-                    stillBooking = CLIHelper.GetBoolFromYesOrNo("Would you like to enter another date range?");
+                    stillBooking = CLIHelper.GetBoolFromYesOrNo("Would you like to enter another date range (y or n)?");
+
+                    if (stillBooking)
+                    {
+                        startDate = CLIHelper.GetDateTime("Enter start date (YYYY/MM/DD):");
+                        endDate = CLIHelper.GetDateTime("Enter end date (YYYY/MM/DD):");
+                    }
+                    
                 }
             } while (stillBooking);
 
@@ -390,16 +403,19 @@ namespace Capstone
             }
         }
 
-        private void BookReservation(List<int> availableSiteNumbers, DateTime startDate, DateTime endDate)
+        private bool BookReservation(List<int> availableSiteNumbers, DateTime startDate, DateTime endDate)
         {
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL();
 
+            bool successfullyBooked = false; 
+
+            Console.WriteLine();
             int siteToReserve = CLIHelper.GetInteger("Which site should be reserved(enter 0 to cancel) ?");
 
             //Return to previous screen if user enters 0
             if (siteToReserve == int.Parse(command_Cancel))
             {
-                return;
+                return successfullyBooked;
             }
 
             while (!(availableSiteNumbers.Contains(siteToReserve)))
@@ -414,8 +430,23 @@ namespace Capstone
 
             if (reservationId.HasValue)
             {
-                Console.WriteLine();
-                Console.WriteLine($"The reservation has been made and the confirmation id is {reservationId}");
+                
+
+                bool returnToPrevious = false;
+                do
+                {
+                    Console.WriteLine();
+                    Console.WriteLine($"The reservation has been made and the confirmation id is {reservationId}");
+
+                    Console.WriteLine();
+                    Console.WriteLine("Press (Enter) Return to previous screen");
+                    char userInput = Console.ReadKey().KeyChar;
+
+                    returnToPrevious = userInput == (char)Keys.Return ? true : false;
+
+                } while (!returnToPrevious);
+                successfullyBooked = true;
+
             }
             else
             {
@@ -423,8 +454,10 @@ namespace Capstone
                 Console.WriteLine("Would you like to enter another date?: ");
                 Console.ReadKey();
             }
-
+            return successfullyBooked;
         }
+
+        
 
         private Dictionary<int, Campground> GetAndPrintCampgrounds(string parkName)
         {
