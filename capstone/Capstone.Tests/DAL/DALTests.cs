@@ -118,21 +118,22 @@ namespace Capstone.Tests
             Assert.AreEqual(5, sites.Count);
         }
 
-        //[TestMethod]
-        //public void BookReservationTest()
-        //{
+        [TestMethod]
+        public void BookReservationTest()
+        {
 
-        //    //Arrange
-        //    CampgroundSqlDAL campgroundSqlDAL = new CampgroundSqlDAL();
-        //    DateTime dt1 = new DateTime(2018, 3, 3, 0, 0, 0);
-        //    DateTime dt2 = new DateTime(2018, 3, 5, 0, 0, 0);
+            //Arrange
+            CampgroundSqlDAL campgroundSqlDAL = new CampgroundSqlDAL();
+            DateTime dt1 = new DateTime(2018, 3, 3, 0, 0, 0);
+            DateTime dt2 = new DateTime(2018, 3, 5, 0, 0, 0);
 
-        //    //Act
-        //    int confirmation = campgroundSqlDAL.BookReservation("Dalton", 43, dt1, dt2);
+            //Act
+            int? confirmation = null;
+                confirmation = campgroundSqlDAL.BookReservation("Dalton", 43, dt1, dt2);
 
-        //    //Assert
-        //    Assert.AreEqual(50, confirmation);
-        //}
+            //Assert
+            Assert.AreEqual(true, confirmation.HasValue);
+        }
 
         [TestMethod]
         public void GetParkAvailabilityTest()
