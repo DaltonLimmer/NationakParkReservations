@@ -136,8 +136,6 @@ namespace Capstone
 
         #endregion end of menus
 
-       
-
         #region CrudCLIMethods()
         private bool GetParkInfo(int parkDictionaryKey)
         {
@@ -467,13 +465,13 @@ namespace Capstone
             //int campgroundNameLength
 
             Console.WriteLine();
-            Console.WriteLine("{0, -6}{1,-25}{2,-12}{3,-12}{4,-14}", "", "Name", "Open", "Close", "Daily Fee");
-            Console.WriteLine(String.Format("").PadRight(65, '='));
+            Console.WriteLine("{0, -6}{1,-35}{2,-12}{3,-12}{4,-14}", "", "Name", "Open", "Close", "Daily Fee");
+            Console.WriteLine(String.Format("").PadRight(80, '='));
 
             foreach (KeyValuePair<int, Campground> campground in campgrounds)
             {
 
-                Console.WriteLine('#' + campground.Key.ToString().PadRight(5) + campground.Value.Name.PadRight(25) + Months[campground.Value.Open_From_MM].PadRight(12) + 
+                Console.WriteLine('#' + campground.Key.ToString().PadRight(5) + campground.Value.Name.PadRight(35) + Months[campground.Value.Open_From_MM].PadRight(12) + 
                     Months[campground.Value.Open_To_MM].PadRight(12) + String.Format("{0:c}", campground.Value.Daily_Fee).PadRight(14));
             }
             return campgrounds;
@@ -499,7 +497,7 @@ namespace Capstone
                 }
 
                 Console.WriteLine();
-                Console.WriteLine("Press (Enter) Return to previous screen");
+                Console.WriteLine("Press (Enter) to return to previous screen");
                 char userInput = Console.ReadKey().KeyChar;
 
                 returnToPrevious = userInput == (char)Keys.Return ? true : false;
